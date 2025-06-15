@@ -1,5 +1,3 @@
--- SQL schema for Student Attendance Management System (MySQL)
-
 -- 1. Departments
 CREATE TABLE Departments (
     department_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -69,7 +67,7 @@ CREATE TABLE Classes (
     FOREIGN KEY (advisor_id) REFERENCES Teachers(teacher_id)
 );
 
--- 7. Enrollments
+-- 7. Enrollments 
 CREATE TABLE Enrollments (
     enrollment_id INT AUTO_INCREMENT PRIMARY KEY,
     student_id INT,
@@ -79,7 +77,7 @@ CREATE TABLE Enrollments (
     FOREIGN KEY (class_id) REFERENCES Classes(class_id)
 );
 
--- 8. Class_Subjects
+-- 8. Class_Subjects 
 CREATE TABLE Class_Subjects (
     class_subject_id INT AUTO_INCREMENT PRIMARY KEY,
     class_id INT,
@@ -121,7 +119,7 @@ CREATE TABLE Sessions (
     FOREIGN KEY (class_subject_id) REFERENCES Class_Subjects(class_subject_id)
 );
 
--- 12. Attendance
+-- 12. Attendance 
 CREATE TABLE Attendance (
     attendance_id INT AUTO_INCREMENT PRIMARY KEY,
     session_id INT,
@@ -158,4 +156,27 @@ CREATE TABLE Permissions (
     role_id INT,
     permission_name VARCHAR(100),
     FOREIGN KEY (role_id) REFERENCES Roles(role_id)
+);
+
+-- 16. Student_Documents 
+CREATE TABLE Student_Documents (
+    student_id INT,
+    document_type VARCHAR(50),
+    file_path TEXT NOT NULL,
+    issue_date DATE,
+    submitted_date DATE,
+    PRIMARY KEY (student_id, document_type),
+    FOREIGN KEY (student_id) REFERENCES Students(student_id) ON DELETE CASCADE
+);
+
+-- 17. Fee_Installments 
+CREATE TABLE Fee_Installments (
+    student_id INT,
+    installment_no INT,
+    amount DECIMAL(10, 2) NOT NULL,
+    due_date DATE NOT NULL,
+    payment_date DATE,
+    status VARCHAR(20),
+    PRIMARY KEY (student_id, installment_no),
+    FOREIGN KEY (student_id) REFERENCES Students(student_id) ON DELETE CASCADE
 );
