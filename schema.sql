@@ -1,8 +1,7 @@
 -- 1. Departments
 CREATE TABLE Departments (
     department_id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    head_of_department_id INT
+    name VARCHAR(100) NOT NULL
 );
 
 -- 2. Teachers
