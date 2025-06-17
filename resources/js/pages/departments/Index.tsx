@@ -43,11 +43,22 @@ import { PlusCircle, Pencil, Trash2 } from 'lucide-react';
 import AppLayout from '@/layouts/app';
 import type { Department } from '@/types';
 
-declare function route(name: string, params?: Record<string, any>): string;
+
+
+import { usePage } from '@inertiajs/react';
+
+// declare function route(name: string, params?: Record<string, any>): string;
 
 interface Props {
     departments: Department[];
 }
+
+type FlashProps = {
+    flash: {
+        message?: string;
+        [key: string]: any;
+    };
+};
 
 export default function Index({ departments }: Props) {
     const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -58,9 +69,17 @@ export default function Index({ departments }: Props) {
     const form = useForm({ name: '' });
     const editForm = useForm({ name: '' });
 
+    const x = usePage<FlashProps>();
+
+    const message = x.props.flash.message;
+
+
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         form.post(route('departments.store'), {
+            preserveScroll: true,
+            // preserveState: false,
             onSuccess: () => {
                 setIsCreateOpen(false);
                 form.reset();
@@ -106,6 +125,9 @@ export default function Index({ departments }: Props) {
 
     return (
         <AppLayout>
+
+            {message && <div className="alert alert-success">{message}</div>}
+
             <Head title="Departments" />
             <Toaster />
             <div className="container mx-auto py-6 space-y-6">

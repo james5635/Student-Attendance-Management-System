@@ -15,6 +15,9 @@ class DepartmentController extends Controller
             'departments' => $departments
         ]);
     }
+    public function create()
+    {
+    }
 
     public function store(Request $request)
     {
@@ -24,6 +27,8 @@ class DepartmentController extends Controller
 
         Department::create($validated);
 
+    
+     
         return redirect()->back()->with('message', 'Department created successfully');
     }
 
