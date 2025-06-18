@@ -6,7 +6,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\DepartmentController;
 
 Route::get('/', function () {
-    return Inertia::render('welcome');
+    return Inertia::location('start');
 })->name('home');
 
 Route::get('start', function () {
