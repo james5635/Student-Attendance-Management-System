@@ -31,4 +31,4 @@ RUN composer install
 RUN npm install && npm run build
 
 # Set command
-CMD ["php", "artisan", "serve","--host","0.0.0.0"]
+CMD php artisan migrate --silent && php artisan serve --host=0.0.0.0
