@@ -27,10 +27,4 @@ WORKDIR /app
 COPY . .
 
 # Install PHP dependencies
-RUN composer install 
-RUN php artisan config:clear
-RUN php artisan config:cache
-RUN npm install && npm run build
-
-# Set command
-CMD php artisan migrate --silent && php artisan serve --host=0.0.0.0
+CMD ["./scripts/run.sh"]
