@@ -28,6 +28,8 @@ COPY . .
 
 # Install PHP dependencies
 RUN composer install 
+RUN php artisan config:clear
+RUN php artisan config:cache
 RUN npm install && npm run build
 
 # Set command
