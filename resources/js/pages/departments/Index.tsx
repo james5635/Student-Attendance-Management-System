@@ -85,6 +85,11 @@ export default function Index({ departments }: Props) {
                 form.reset();
                 toast({ title: 'Success', description: 'Department created successfully' });
             },
+            onError: (errors) => {
+                Object.values(errors).forEach((error) => {
+                    toast({ title: 'Error', description: error });
+                });
+            },
         });
     };
 

@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ClassroomRequest;
 use App\Models\Classroom;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Validation\Rule;
 
 class ClassroomController extends Controller
 {
@@ -31,14 +33,9 @@ class ClassroomController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-
+    public function store(ClassroomRequest $request)
     {
-        $validated = $request->validate([
-            'building' => 'required|string|max:50',
-            'room_number' => 'required|string|max:10',
-            'capacity' => 'nullable|integer',
-        ]);
+        $validated = $request->validated();
 
 
         Classroom::create($validated);
@@ -65,13 +62,10 @@ class ClassroomController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Classroom $classroom)
+    public function update(ClassroomRequest $request, Classroom $classroom)
     {
-        $validated = $request->validate([
-            'building' => 'required|string|max:50',
-            'room_number' => 'required|string|max:10',
-            'capacity' => 'nullable|integer',
-        ]);
+        $validated = $request->validated();
+
 
         $classroom->update($validated);
         return redirect()->back()->with('message', 'Classroom updated successfully');
@@ -81,7 +75,6 @@ class ClassroomController extends Controller
      * Remove the specified resource from storage.
      */
     public function destroy(Classroom $classroom)
-
     {
         $classroom->delete();
         return redirect()->back()->with('message', 'Classroom deleted successfully');
