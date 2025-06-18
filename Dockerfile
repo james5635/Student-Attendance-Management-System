@@ -12,9 +12,10 @@ RUN apk add --no-cache \
     curl-dev \
     openssl-dev \
     sqlite-dev \
+    libpq-dev \
     oniguruma-dev  \
     npm 
-RUN docker-php-ext-install pdo_mysql pdo_sqlite  pdo_mysql mbstring exif pcntl bcmath gd
+RUN docker-php-ext-install pdo_mysql pdo_sqlite  pdo_pgsql mbstring exif pcntl bcmath gd
 # RUN docker-php-ext-install mysqli pdo_mysql sqlite3 pdo_sqlite pgsql pdo_pgsql 
 
 # Install Composer
