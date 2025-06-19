@@ -36,10 +36,7 @@ class ClassroomController extends Controller
     public function store(ClassroomRequest $request)
     {
         $validated = $request->validated();
-
-
         Classroom::create($validated);
-
         return redirect()->back()->with('message', 'Classroom created successfully');
     }
 
@@ -65,8 +62,6 @@ class ClassroomController extends Controller
     public function update(ClassroomRequest $request, Classroom $classroom)
     {
         $validated = $request->validated();
-
-
         $classroom->update($validated);
         return redirect()->back()->with('message', 'Classroom updated successfully');
     }

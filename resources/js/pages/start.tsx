@@ -2,11 +2,12 @@ import { ArrowRight } from 'lucide-react';
 
 export default function Start() {
     const links = [
-        { href: "/dashboard", label: "Go to Dashboard" },
-        { href: "/departments", label: "Go to Department" },
-        { href: "/classrooms", label: "Go to Classroom" },
+        { href: "/dashboard", label: "Dashboard" },
+        { href: "/departments", label: "Department" },
+        { href: "/classrooms", label: "Classroom" },
+        { href: "/subjects", label: "Subject" },
+                    
     ];
-
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 dark:from-gray-900 dark:via-gray-800 dark:to-black transition-colors duration-500">
             <div className="bg-white/90 dark:bg-gray-900/80 backdrop-blur-xl shadow-2xl rounded-3xl p-8 sm:p-10 w-full max-w-md space-y-8 border border-white/30 dark:border-gray-700 transition-all duration-500">

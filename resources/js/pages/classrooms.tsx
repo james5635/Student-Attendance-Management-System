@@ -196,30 +196,30 @@ export default function Classroom({ classrooms }: ClassroomProps) {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {classrooms?.map((department) => (
-                                    <TableRow key={department.classroom_id}>
+                                {classrooms?.map((classroom) => (
+                                    <TableRow key={classroom.classroom_id}>
                                         <TableCell className="font-medium">
-                                            {department.classroom_id}
+                                            {classroom.classroom_id}
                                         </TableCell>
-                                        <TableCell>{department.building}</TableCell>
+                                        <TableCell>{classroom.building}</TableCell>
                                         <TableCell>
-                                            {department.room_number}
+                                            {classroom.room_number}
                                         </TableCell>
                                         <TableCell>
-                                            {department.capacity}
+                                            {classroom.capacity}
                                         </TableCell>
                                         <TableCell className="text-right space-x-2">
                                             <Button
                                                 variant="outline"
                                                 size="icon"
-                                                onClick={(e) => handleEditClick(department)}
+                                                onClick={(e) => handleEditClick(classroom)}
                                             >
                                                 <Pencil className="h-4 w-4" />
                                             </Button>
                                             <Button
                                                 variant="destructive"
                                                 size="icon"
-                                                onClick={(e) => handleDeleteClick(department)}
+                                                onClick={(e) => handleDeleteClick(classroom)}
                                             >
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>
@@ -234,9 +234,9 @@ export default function Classroom({ classrooms }: ClassroomProps) {
             <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Edit Department</DialogTitle>
+                        <DialogTitle>Edit classroom</DialogTitle>
                         <DialogDescription>
-                            Update the department information.
+                            Update the classroom information.
                         </DialogDescription>
                     </DialogHeader>
                     <form onSubmit={handleUpdateSubmit} className="space-y-4">

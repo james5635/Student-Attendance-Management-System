@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ClassroomController;
+use App\Http\Controllers\SubjectController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\DepartmentController;
@@ -18,6 +19,17 @@ Route::get('/classrooms', [ClassroomController::class, 'index'])->name('classroo
 Route::post('/classrooms', [ClassroomController::class, 'store'])->name('classrooms.store');
 Route::put('/classrooms/{classroom}', [ClassroomController::class, 'update'])->name('classrooms.update');
 Route::delete('/classrooms/{classroom}', [ClassroomController::class, 'destroy'])->name('classrooms.destroy');
+
+
+// Classroom routes
+Route::get('/subjects', [SubjectController::class, 'index'])->name('subjects.index');
+Route::post('/subjects', [SubjectController::class, 'store'])->name('subjects.store');
+Route::put('/subjects/{subject}', [SubjectController::class, 'update'])->name('subjects.update');
+Route::delete('/subjects/{subject}', [SubjectController::class, 'destroy'])->name('subjects.destroy');
+
+
+
+
 
 // Department routes
 Route::get('/departments', [DepartmentController::class, 'index'])->name('departments.index');
