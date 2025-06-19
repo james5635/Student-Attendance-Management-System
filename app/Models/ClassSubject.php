@@ -6,8 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class ClassSubject extends Model
 {
-        protected $primaryKey = 'class_subject_id';
+    protected $primaryKey = 'class_subject_id';
     protected $fillable = ['class_id', 'subject_id', 'teacher_id'];
+    public $timestamps = true;
+
 
     public function class()
     {

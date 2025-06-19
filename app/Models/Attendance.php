@@ -8,6 +8,8 @@ class Attendance extends Model
 {
     protected $primaryKey = 'attendance_id';
     protected $fillable = ['session_id', 'student_id', 'status', 'remarks'];
+    public $timestamps = true;
+
 
     public function session(): BelongsTo
     {

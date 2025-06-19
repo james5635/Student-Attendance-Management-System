@@ -9,6 +9,8 @@ class ClassSession extends Model
     protected $primaryKey = 'session_id';
     protected $fillable = ['class_subject_id', 'session_date', 'start_time', 'end_time', 'status'];
 
+    public $timestamps = true;
+
     public function classSubject()
     {
         return $this->belongsTo(ClassSubject::class, 'class_subject_id');

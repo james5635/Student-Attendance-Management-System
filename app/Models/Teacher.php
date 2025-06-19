@@ -6,8 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Teacher extends Model
 {
-        protected $primaryKey = 'teacher_id';
+    protected $primaryKey = 'teacher_id';
     protected $fillable = ['first_name', 'last_name', 'email', 'phone', 'department_id', 'hire_date', 'status'];
+    public $timestamps = true;
 
     public function department()
     {
