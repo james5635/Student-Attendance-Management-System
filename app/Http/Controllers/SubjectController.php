@@ -18,12 +18,21 @@ class SubjectController extends Controller
     {
         $subjects = Subject::all();
         $minimal_courses = Course::select("course_id", "name")->get();
-        // foreach ($subjects as $id => $subject) {
-        //     echo $id . ' ' . $subject->name . '<br />';
-        // }
+        $minimal_classrooms = DB::table('classrooms')
+            ->select('classroom_id')
+            ->get();
+        $minimal_teachers = DB::table('teachers')
+            ->select('teacher_id', 'first_name', 'last_name')
+            ->get();
+        $minimal_classes = DB::table('classes')
+            ->select('class_id')
+            ->get();
         return Inertia::render('subjects', [
             'subjects' => $subjects,
-            'minimal_courses' => $minimal_courses
+            'minimal_courses' => $minimal_courses,
+            'minimal_classrooms' => $minimal_classrooms,
+            'minimal_teachers' => $minimal_teachers,
+            'minimal_classes' => $minimal_classes,
         ]);
     }
 
@@ -40,7 +49,10 @@ class SubjectController extends Controller
      */
     public function store(SubjectRequest $request)
     {
-
+        error_log("SubjectController@store called");
+        $validated = $request->validated();
+        Subject::create($validated);
+        return redirect()->back()->with('message', 'Subject created successfully');
 
     }
 
@@ -66,7 +78,7 @@ class SubjectController extends Controller
     public function update(SubjectRequest $request, Subject $subject)
     {
         $validated = $request->validated();
-        Subject::update($validated);
+        $subject->update($validated);
         return redirect()->back()->with('message', 'Subject updated successfully');
     }
 
@@ -75,6 +87,8 @@ class SubjectController extends Controller
      */
     public function destroy(Subject $subject)
     {
-        //
+        
+        $subject->delete();
+        return redirect()->back()->with('message', 'Subject deleted successfully');
     }
 }

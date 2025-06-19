@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\ClassroomController;
 use App\Http\Controllers\SubjectController;
+use App\Http\Controllers\ClassSubjectController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\ScheduleController;
 
 Route::get('/', function () {
     return Inertia::location('start');
@@ -27,7 +29,11 @@ Route::post('/subjects', [SubjectController::class, 'store'])->name('subjects.st
 Route::put('/subjects/{subject}', [SubjectController::class, 'update'])->name('subjects.update');
 Route::delete('/subjects/{subject}', [SubjectController::class, 'destroy'])->name('subjects.destroy');
 
+// ClassSubject routes
+Route::post('/class-subjects', [ClassSubjectController::class, 'store'])->name('class-subjects.store');
 
+// Schedule routes
+Route::post('/schedules', [ScheduleController::class, 'store'])->name('schedules.store');
 
 
 

@@ -22,7 +22,7 @@ class SubjectRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'course_id' => 'required|integer|exists:courses,id',
+            'course_id' => 'required|integer|exists:courses', // fix
             'name' => 'required|string|max:100',
             'code' => 'required|string|max:20',
             'credits' => 'nullable|integer',
