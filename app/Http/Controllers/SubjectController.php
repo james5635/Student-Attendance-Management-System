@@ -59,9 +59,58 @@ class SubjectController extends Controller
     /**
      * Display the specified resource.
      */
+    /*
+        SELECT
+      s.subject_id, -- First column as requested
+
+      s.name AS subject_name,
+      s.code AS subject_code,
+      s.credits,
+      s.description,
+
+      cs.class_subject_id,
+      cs.class_id,
+      cs.teacher_id,
+
+      sch.schedule_id,
+      sch.day_of_week,
+      sch.start_time,
+      sch.end_time,
+      sch.classroom_id,
+
+      c.building,
+      c.room_number,
+      c.capacity
+
+      FROM class_subjects cs
+      INNER JOIN subjects s ON cs.subject_id = s.subject_id
+      INNER JOIN schedules sch ON cs.class_subject_id = sch.class_subject_id
+      INNER JOIN classrooms c ON sch.classroom_id = c.classroom_id;
+
+    */
     public function show(Subject $subject)
     {
 
+        $subject_details = DB::table('class_subjects as cs')
+            ->join('subjects as s', 'cs.subject_id', '=', 's.subject_id')
+            ->join('schedules as sch', 'cs.class_subject_id', '=', 'sch.class_subject_id')
+            ->join('classrooms as c', 'sch.classroom_id', '=', 'c.classroom_id')
+            ->where('s.subject_id', $subject->subject_id)
+            ->select([
+                'cs.class_id',
+                'cs.teacher_id',
+                'sch.day_of_week',
+                'sch.start_time',
+                'sch.end_time',
+                'sch.classroom_id',
+                'c.building',
+                'c.room_number',
+                'c.capacity',
+            ])
+            ->get();
+        return Inertia::render('subject-detail', [
+            'subject_details' => $subject_details
+        ]);
     }
 
     /**
@@ -87,7 +136,7 @@ class SubjectController extends Controller
      */
     public function destroy(Subject $subject)
     {
-        
+
         $subject->delete();
         return redirect()->back()->with('message', 'Subject deleted successfully');
     }

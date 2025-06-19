@@ -130,7 +130,7 @@ export default function Subject({ subjects, minimal_courses, minimal_classrooms,
     }
 
     const handleDetailClick = (subject: Subject) => {
-
+        window.open(route('subject-detail.show', subject.subject_id), '_blank')
     }
     const handleEditClick = (subject: Subject) => {
         setselectedSubject(subject);
@@ -304,7 +304,7 @@ export default function Subject({ subjects, minimal_courses, minimal_classrooms,
                                         </TableCell>
                                         <TableCell className="text-right space-x-2">
                                             <Button
-                                                variant="secondary"
+                                                variant="outline"
                                                 size="icon"
                                                 onClick={(e) => handleDetailClick(subject)}
                                             >

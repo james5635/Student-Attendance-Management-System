@@ -23,8 +23,9 @@ Route::put('/classrooms/{classroom}', [ClassroomController::class, 'update'])->n
 Route::delete('/classrooms/{classroom}', [ClassroomController::class, 'destroy'])->name('classrooms.destroy');
 
 
-// Classroom routes
+// Subject routes
 Route::get('/subjects', [SubjectController::class, 'index'])->name('subjects.index');
+Route::get('/subject-detail/{subject}', [SubjectController::class, 'show'])->name('subject-detail.show');
 Route::post('/subjects', [SubjectController::class, 'store'])->name('subjects.store');
 Route::put('/subjects/{subject}', [SubjectController::class, 'update'])->name('subjects.update');
 Route::delete('/subjects/{subject}', [SubjectController::class, 'destroy'])->name('subjects.destroy');
