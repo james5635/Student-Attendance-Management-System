@@ -42,7 +42,7 @@ export default function Subject({ subjects, minimal_courses }: SubjectPageProps)
     const [selectedSubject, setselectedSubject] = useState<Subject | null>(null);
 
     // minimal_courses.forEach((x) => console.log(x))
-// 
+    // 
     const form: InertiaFormProps<SubjectFormData> = useForm<SubjectFormData>({
         course_id: 0,
         name: '',
@@ -148,21 +148,7 @@ export default function Subject({ subjects, minimal_courses }: SubjectPageProps)
                             </DialogHeader>
                             <form onSubmit={handleCreateSubmit} className="space-y-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="Course ID">Course ID</Label>
-                                    <Select onValueChange={(value) => console.log("Selected:", value)}>
-                                        <SelectTrigger id="Course ID">
-                                            <SelectValue placeholder="Select a fruit" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {
-                                                minimal_courses.map(x =>
-                                                    <SelectItem key={x.course_id} value={x.course_id.toString()}>
-                                                        {x.course_id}
-                                                    </SelectItem>
-                                                )
-                                            }
-                                        </SelectContent>
-                                    </Select>
+
                                     <Label htmlFor="name">Name</Label>
                                     <Input
                                         id="name"
@@ -211,6 +197,30 @@ export default function Subject({ subjects, minimal_courses }: SubjectPageProps)
                                         <p className="text-sm text-destructive">{form.errors.description}</p>
                                     )}
                                 </div>
+                                <Label >Course</Label>
+                                <br />
+                                <Label htmlFor="Course ID">Course ID</Label>
+                                <Select onValueChange={(value) => {
+                                    const found = minimal_courses.find(
+                                    document.getElementById("course name")!.innerHTML = found
+                                }}>
+                                    <SelectTrigger id="Course ID">
+                                        <SelectValue placeholder="Select a fruit" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {
+                                            minimal_courses.map(x =>
+                                                <SelectItem key={x.course_id} value={x.course_id.toString()}>
+                                                    {x.course_id}
+                                                </SelectItem>
+                                            )
+                                        }
+                                    </SelectContent>
+                                </Select>
+                                <Label>Course Name</Label>
+                                <br></br>
+                                <Label id="course name"></Label>
+
                                 <DialogFooter>
                                     <Button type="submit" disabled={form.processing}>
                                         Create Subject
