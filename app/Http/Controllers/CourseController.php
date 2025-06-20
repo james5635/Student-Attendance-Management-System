@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Course;
+use App\Models\Department;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -14,8 +15,10 @@ class CourseController extends Controller
     public function index()
     {
         $courses = Course::all();
-        return Inertia::render('subjects', [
-            'courses' => $courses
+        $minimal_departments = Department::select('department_id', 'name')->get();
+        return Inertia::render('courses', [
+            'courses' => $courses,
+            'minimal_departments' => $minimal_departments,
         ]);
     }
 
@@ -32,7 +35,18 @@ class CourseController extends Controller
      */
     public function store(Request $request)
     {
-        //
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'code' => 'required|string|max:10|unique:courses,code',
+            'department_id' => 'required|exists:departments,department_id',
+            'duration_semesters' => 'required|integer|min:1',
+            'description' => 'nullable|string|max:1000',
+        ]);
+
+        Course::create($validated);
+
+        return redirect()->back()->with('success', 'Course created successfully.');
     }
 
     /**
@@ -56,7 +70,18 @@ class CourseController extends Controller
      */
     public function update(Request $request, Course $course)
     {
-        //
+    
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'code' => 'required|string|max:10',
+            'department_id' => 'required|exists:departments,department_id',
+            'duration_semesters' => 'required|integer|min:1',
+            'description' => 'nullable|string|max:1000',
+        ]);
+
+        $course->update($validated);
+
+        return redirect()->back()->with('success', 'Course updated successfully.');
     }
 
     /**
@@ -64,6 +89,8 @@ class CourseController extends Controller
      */
     public function destroy(Course $course)
     {
-        //
+        $course->delete();
+
+        return redirect()->back()->with('success', 'Course deleted successfully.');
     }
 }

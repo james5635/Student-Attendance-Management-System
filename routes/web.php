@@ -3,6 +3,7 @@
 use App\Http\Controllers\ClassroomController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\ClassSubjectController;
+use App\Http\Controllers\CourseController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\DepartmentController;
@@ -29,6 +30,12 @@ Route::get('/subject-detail/{subject}', [SubjectController::class, 'show'])->nam
 Route::post('/subjects', [SubjectController::class, 'store'])->name('subjects.store');
 Route::put('/subjects/{subject}', [SubjectController::class, 'update'])->name('subjects.update');
 Route::delete('/subjects/{subject}', [SubjectController::class, 'destroy'])->name('subjects.destroy');
+
+// Course routes
+Route::get('/courses', [CourseController::class, 'index'])->name('courses.index');
+Route::post('/courses', [CourseController::class, 'store'])->name('courses.store');
+Route::put('/courses/{course}', [CourseController::class, 'update'])->name('courses.update');
+Route::delete('/courses/{course}', [CourseController::class, 'destroy'])->name('courses.destroy');
 
 // ClassSubject routes
 Route::post('/class-subjects', [ClassSubjectController::class, 'store'])->name('class-subjects.store');
