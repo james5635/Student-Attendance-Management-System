@@ -9,6 +9,7 @@ export default function Start() {
         { href: "/courses", label: "Course" },
         { href: "/teachers", label: "Teacher" },
         { href: "/students", label: "Student" },
+        { href: "/class-sessions", label: "ClassSession" },
         
                     
     ];

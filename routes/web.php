@@ -71,6 +71,12 @@ Route::post('/classes', [App\Http\Controllers\SchoolClassController::class, 'sto
 // Enrollment routes
 Route::post('/enrollments', [App\Http\Controllers\EnrollmentController::class, 'store'])->name('enrollments.store');
 
+// ClassSession routes
+Route::get('/class-sessions', [App\Http\Controllers\ClassSessionController::class, 'index'])->name('class-sessions.index');
+Route::post('/class-sessions', [App\Http\Controllers\ClassSessionController::class, 'store'])->name('class-sessions.store');
+Route::put('/class-sessions/{classSession}', [App\Http\Controllers\ClassSessionController::class, 'update'])->name('class-sessions.update');
+Route::delete('/class-sessions/{classSession}', [App\Http\Controllers\ClassSessionController::class, 'destroy'])->name('class-sessions.destroy');
+
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
