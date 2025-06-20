@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\ScheduleController;
+use App\Http\Controllers\TeacherController;
 
 Route::get('/', function () {
     return Inertia::location('start');
@@ -51,6 +52,11 @@ Route::post('/departments', [DepartmentController::class, 'store'])->name('depar
 Route::put('/departments/{department}', [DepartmentController::class, 'update'])->name('departments.update');
 Route::delete('/departments/{department}', [DepartmentController::class, 'destroy'])->name('departments.destroy');
 
+// Teacher routes
+Route::get('/teachers', [TeacherController::class, 'index'])->name('teachers.index');
+Route::post('/teachers', [TeacherController::class, 'store'])->name('teachers.store');
+Route::put('/teachers/{teacher}', [TeacherController::class, 'update'])->name('teachers.update');
+Route::delete('/teachers/{teacher}', [TeacherController::class, 'destroy'])->name('teachers.destroy');
 
 
 Route::middleware(['auth', 'verified'])->group(function () {

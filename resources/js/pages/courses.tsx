@@ -97,15 +97,15 @@ export default function CoursePage({ courses, minimal_departments }: CoursePageP
     }
 
 
-    const handleEditClick = (subject: Course) => {
-        setselectedCourse(subject);
+    const handleEditClick = (course: Course) => {
+        setselectedCourse(course);
 
         form.setData({
-            name: subject.name,
-            code: subject.code,
-            department_id: subject.department_id,
-            duration_semesters: subject.duration_semesters,
-            description: subject.description
+            name: course.name,
+            code: course.code,
+            department_id: course.department_id,
+            duration_semesters: course.duration_semesters,
+            description: course.description
         });
         setIsEditOpen(true);
     }
@@ -299,7 +299,7 @@ export default function CoursePage({ courses, minimal_departments }: CoursePageP
                     <DialogHeader>
                         <DialogTitle>Select Department</DialogTitle>
                         <DialogDescription>
-                            Choose a department to associate with the subject.
+                            Choose a department to associate with the course.
                         </DialogDescription>
                     </DialogHeader>
                     <form onSubmit={handleCreateSubmit} className="space-y-4">
@@ -311,7 +311,7 @@ export default function CoursePage({ courses, minimal_departments }: CoursePageP
                                 form.setData('department_id', parseInt(val));
                             }}>
                                 <SelectTrigger id="department_id">
-                                    <SelectValue placeholder="Select a course" />
+                                    <SelectValue placeholder="Select a department" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {
@@ -323,7 +323,7 @@ export default function CoursePage({ courses, minimal_departments }: CoursePageP
                                     }
                                 </SelectContent>
                             </Select>
-                            <Label>Course Name</Label>
+                            <Label>Department Name</Label>
                             <Input id="department name" readOnly></Input>
 
                         </div>
@@ -349,12 +349,12 @@ export default function CoursePage({ courses, minimal_departments }: CoursePageP
                     <form onSubmit={handleUpdateSubmit} className="space-y-4">
                         <div className="space-y-2">
                             <div className="space-y-2">
-                                <Label htmlFor="department_id">Course ID</Label>
+                                <Label htmlFor="department_id">Department ID</Label>
                                 <Select onValueChange={(val) => {
                                     form.setData('department_id', parseInt(val));
                                 }}>
                                     <SelectTrigger id="department_id">
-                                        <SelectValue placeholder="Select a course" />
+                                        <SelectValue placeholder="Select a department" />
                                     </SelectTrigger>
                                     <SelectContent >
                                         {

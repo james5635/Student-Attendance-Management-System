@@ -7,6 +7,7 @@ export default function Start() {
         { href: "/classrooms", label: "Classroom" },
         { href: "/subjects", label: "Subject" },
         { href: "/courses", label: "Course" },
+        { href: "/teachers", label: "Teacher" },
         
                     
     ];
