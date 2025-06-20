@@ -109,7 +109,8 @@ class SubjectController extends Controller
             ])
             ->get();
         return Inertia::render('subject-detail', [
-            'subject_details' => $subject_details
+            'subject_details' => $subject_details,
+            'subject' => $subject,
         ]);
     }
 

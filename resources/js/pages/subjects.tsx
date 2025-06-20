@@ -237,7 +237,7 @@ export default function Subject({ subjects, minimal_courses, minimal_classrooms,
                                         onChange={e => form.setData('description', e.target.value)}
                                         required
                                     />
-                                    {form.errors.course_id && (
+                                    {/* {form.errors.course_id && (
                                         <p className="text-sm text-destructive">{form.errors.course_id}</p>
                                     )}
                                     {form.errors.name && (
@@ -250,7 +250,7 @@ export default function Subject({ subjects, minimal_courses, minimal_classrooms,
                                     )}
                                     {form.errors.description && (
                                         <p className="text-sm text-destructive">{form.errors.description}</p>
-                                    )}
+                                    )} */}
                                 </div>
 
                                 <DialogFooter>
