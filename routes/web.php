@@ -60,6 +60,7 @@ Route::delete('/teachers/{teacher}', [TeacherController::class, 'destroy'])->nam
 
 // Student routes
 Route::get('/students', [App\Http\Controllers\StudentController::class, 'index'])->name('students.index');
+Route::get('/student-detail/{student}', [App\Http\Controllers\StudentController::class, 'show'])->name('students.show');
 Route::post('/students', [App\Http\Controllers\StudentController::class, 'store'])->name('students.store');
 Route::put('/students/{student}', [App\Http\Controllers\StudentController::class, 'update'])->name('students.update');
 Route::delete('/students/{student}', [App\Http\Controllers\StudentController::class, 'destroy'])->name('students.destroy');

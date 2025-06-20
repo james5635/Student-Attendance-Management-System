@@ -663,9 +663,9 @@ export default function StudentPage({ students, minimal_departments, minimal_cou
             <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Edit subject</DialogTitle>
+                        <DialogTitle>Edit student</DialogTitle>
                         <DialogDescription>
-                            Update the subject information.
+                            Update the student information.
                         </DialogDescription>
                     </DialogHeader>
                     <form onSubmit={handleUpdateSubmit} className="space-y-4">
@@ -690,82 +690,120 @@ export default function StudentPage({ students, minimal_departments, minimal_cou
                                 </Select>
 
                             </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="first_name">First Name</Label>
-                                <Input
-                                    id="first_name"
-                                    placeholder="Enter first name"
-                                    value={form.data.first_name}
-                                    onChange={e => form.setData('first_name', e.target.value)}
-                                    required
-                                />
-                                {form.errors.first_name && (
-                                    <p className="text-sm text-destructive">{form.errors.first_name}</p>
-                                )}
-                                <Label htmlFor="last_name">Last Name</Label>
-                                <Input
-                                    id="last_name"
-                                    placeholder="Enter last name"
-                                    value={form.data.last_name}
-                                    onChange={e => form.setData('last_name', e.target.value)}
-                                    required
-                                />
-                                {form.errors.last_name && (
-                                    <p className="text-sm text-destructive">{form.errors.last_name}</p>
-                                )}
-                                <Label htmlFor="email">Email</Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    placeholder="Enter email"
-                                    value={form.data.email}
-                                    onChange={e => form.setData('email', e.target.value)}
-                                    required
-                                />
-                                {form.errors.email && (
-                                    <p className="text-sm text-destructive">{form.errors.email}</p>
-                                )}
-                                <Label htmlFor="phone">Phone</Label>
-                                <Input
-                                    id="phone"
-                                    type="tel"
-                                    placeholder="Enter phone number"
-                                    value={form.data.phone || ''}
-                                    onChange={e => form.setData('phone', e.target.value)}
-                                />
-                                {form.errors.phone && (
-                                    <p className="text-sm text-destructive">{form.errors.phone}</p>
-                                )}
-                                <Label htmlFor='hire_date'>Hire Date</Label>
-                                <Input
-                                    id="hire_date"
-                                    type="date"
-                                    placeholder="YYYY-MM-DD"
-                                    value={form.data.hire_date || ''}
-                                    onChange={e => form.setData('hire_date', e.target.value)}
-                                    required
-                                />
-                                {form.errors.hire_date && (
-                                    <p className="text-sm text-destructive">{form.errors.hire_date}</p>
-                                )}
-                                <Label htmlFor="status">Status</Label>
-                                <Select onValueChange={(val) => {
-                                    form.setData('status', val);
-                                }}>
-                                    <SelectTrigger id="status">
-                                        <SelectValue placeholder="Select status" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="Active">Active</SelectItem>
-                                        <SelectItem value="Inactive">Inactive</SelectItem>
-                                        <SelectItem value="On Sabbatical">On Sabbatical</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                {form.errors.status && (
-                                    <p className="text-sm text-destructive">{form.errors.status}</p>
-                                )}
+                           <div className="space-y-2">
 
-                            </div>
+                                    <Label htmlFor="first_name">First Name</Label>
+                                    <Input
+                                        id="first_name"
+                                        placeholder="Enter first name"
+                                        value={form.data.first_name}
+                                        onChange={e => form.setData('first_name', e.target.value)}
+                                        required
+                                    />
+                                    {form.errors.first_name && (
+                                        <p className="text-sm text-destructive">{form.errors.first_name}</p>
+                                    )}
+                                    <Label htmlFor="last_name">Last Name</Label>
+                                    <Input
+                                        id="last_name"
+                                        placeholder="Enter last name"
+                                        value={form.data.last_name}
+                                        onChange={e => form.setData('last_name', e.target.value)}
+                                        required
+                                    />
+                                    {form.errors.last_name && (
+                                        <p className="text-sm text-destructive">{form.errors.last_name}</p>
+                                    )}
+                                    <Label htmlFor="dob">Date of Birth</Label>
+                                    <Input
+                                        id="dob"
+                                        type="date"
+                                        placeholder="YYYY-MM-DD"
+                                        value={form.data.dob || ''}
+                                        onChange={e => form.setData('dob', e.target.value)}
+                                        required
+                                    />
+                                    {form.errors.dob && (
+                                        <p className="text-sm text-destructive">{form.errors.dob}</p>
+                                    )}
+                                    <Label htmlFor="gender">Gender</Label>
+                                    <Select
+                                        onValueChange={(val) => form.setData('gender', val)}
+                                        value={form.data.gender || undefined}
+                                    >
+                                        <SelectTrigger id="gender">
+                                            <SelectValue placeholder="Select gender" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="Male">Male</SelectItem>
+                                            <SelectItem value="Female">Female</SelectItem>
+                                            <SelectItem value="Other">Other</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    {form.errors.gender && (
+                                        <p className="text-sm text-destructive">{form.errors.gender}</p>
+                                    )}
+                                    <Label htmlFor="email">Email</Label>
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        placeholder="Enter email"
+                                        value={form.data.email}
+                                        onChange={e => form.setData('email', e.target.value)}
+                                        required
+                                    />
+                                    {form.errors.email && (
+                                        <p className="text-sm text-destructive">{form.errors.email}</p>
+                                    )}
+                                    <Label htmlFor="phone">Phone</Label>
+                                    <Input
+                                        id="phone"
+                                        type="tel"
+                                        placeholder="Enter phone number"
+                                        value={form.data.phone || ''}
+                                        onChange={e => form.setData('phone', e.target.value)}
+                                    />
+                                    {form.errors.phone && (
+                                        <p className="text-sm text-destructive">{form.errors.phone}</p>
+                                    )}
+                                    <Label htmlFor="address">Address</Label>
+                                    <Input
+                                        id="address"
+                                        placeholder="Enter address"
+                                        value={form.data.address || ''}
+                                        onChange={e => form.setData('address', e.target.value)}
+                                    />
+                                    {form.errors.address && (
+                                        <p className="text-sm text-destructive">{form.errors.address}</p>
+                                    )}
+                                    <Label htmlFor="enrollment_year">Enrollment Year</Label>
+                                    <Input
+                                        id="enrollment_year"
+                                        type="number"
+                                        placeholder="Enter enrollment year"
+                                        value={form.data.enrollment_year || ''}
+                                        onChange={e => form.setData('enrollment_year', e.target.value ? parseInt(e.target.value) : null)}
+                                    />
+                                    {form.errors.enrollment_year && (
+                                        <p className="text-sm text-destructive">{form.errors.enrollment_year}</p>
+                                    )}
+                                    <Label htmlFor="status">Status</Label>
+                                    <Select
+                                        onValueChange={(val) => form.setData('status', val)}
+                                        value={form.data.status || undefined}
+                                    >
+                                        <SelectTrigger id="status">
+                                            <SelectValue placeholder="Select status" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="Active">Active</SelectItem>
+                                            <SelectItem value="Inactive">Inactive</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    {form.errors.status && (
+                                        <p className="text-sm text-destructive">{form.errors.status}</p>
+                                    )}
+                                </div>
                         </div>
                         <DialogFooter>
                             <Button type="submit" disabled={form.processing}>
