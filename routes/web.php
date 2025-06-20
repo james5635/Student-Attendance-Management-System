@@ -58,6 +58,18 @@ Route::post('/teachers', [TeacherController::class, 'store'])->name('teachers.st
 Route::put('/teachers/{teacher}', [TeacherController::class, 'update'])->name('teachers.update');
 Route::delete('/teachers/{teacher}', [TeacherController::class, 'destroy'])->name('teachers.destroy');
 
+// Student routes
+Route::get('/students', [App\Http\Controllers\StudentController::class, 'index'])->name('students.index');
+Route::post('/students', [App\Http\Controllers\StudentController::class, 'store'])->name('students.store');
+Route::put('/students/{student}', [App\Http\Controllers\StudentController::class, 'update'])->name('students.update');
+Route::delete('/students/{student}', [App\Http\Controllers\StudentController::class, 'destroy'])->name('students.destroy');
+
+// SchoolClass routes
+Route::post('/classes', [App\Http\Controllers\SchoolClassController::class, 'store'])->name('classes.store');
+
+// Enrollment routes
+Route::post('/enrollments', [App\Http\Controllers\EnrollmentController::class, 'store'])->name('enrollments.store');
+
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
