@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Head, useForm, router } from '@inertiajs/react';
+import { Head, useForm, router, InertiaFormProps } from '@inertiajs/react';
 import {
     Card,
     CardContent,
@@ -27,8 +27,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { toast } from "@/components/ui/use-toast";
-import { Toaster } from "@/components/ui/toaster";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -42,38 +40,19 @@ import {
 import { PlusCircle, Pencil, Trash2 } from 'lucide-react';
 import AppLayout from '@/layouts/app';
 import type { Department } from '@/types';
-
-
-
-import { usePage } from '@inertiajs/react';
-
-// declare function route(name: string, params?: Record<string, any>): string;
-
+import { ToastContainer, toast } from 'react-toastify';
 interface Props {
     departments: Department[];
 }
-
-type FlashProps = {
-    flash: {
-        message?: string;
-        [key: string]: any;
-    };
-};
-
+type DepartmentFormData = Pick<Department, 'name'>;
 export default function Index({ departments }: Props) {
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
     const [selectedDepartment, setSelectedDepartment] = useState<Department | null>(null);
 
-    const form = useForm({ name: '' });
-    const editForm = useForm({ name: '' });
-
-    const x = usePage<FlashProps>();
-
-    const message = x.props.flash.message;
-
-
+    const form: InertiaFormProps<DepartmentFormData> = useForm<DepartmentFormData>({ name: '' });
+    const editForm: InertiaFormProps<DepartmentFormData> = useForm<DepartmentFormData>({ name: '' });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -82,12 +61,13 @@ export default function Index({ departments }: Props) {
             // preserveState: false,
             onSuccess: () => {
                 setIsCreateOpen(false);
+                form.setDefaults({ name: '' });
                 form.reset();
-                toast({ title: 'Success', description: 'Department created successfully' });
+                toast('Department created successfully');
             },
             onError: (errors) => {
                 Object.values(errors).forEach((error) => {
-                    toast({ title: 'Error', description: error });
+                    toast(error);
                 });
             },
         });
@@ -104,10 +84,11 @@ export default function Index({ departments }: Props) {
         if (!selectedDepartment) return;
         editForm.put(route('departments.update', selectedDepartment.department_id), {
             onSuccess: () => {
+                editForm.setDefaults({ name: '' });
                 setIsEditOpen(false);
                 setSelectedDepartment(null);
                 editForm.reset();
-                toast({ title: 'Success', description: 'Department updated successfully' });
+                toast('Department updated successfully');
             },
         });
     };
@@ -123,7 +104,7 @@ export default function Index({ departments }: Props) {
             onSuccess: () => {
                 setIsDeleteOpen(false);
                 setSelectedDepartment(null);
-                toast({ title: 'Success', description: 'Department deleted successfully' });
+                toast('Department deleted successfully');
             },
         });
     };
@@ -131,10 +112,8 @@ export default function Index({ departments }: Props) {
     return (
         <AppLayout>
 
-            {message && <div className="alert alert-success">{message}</div>}
-
             <Head title="Departments" />
-            <Toaster />
+            <ToastContainer />
             <div className="container mx-auto py-6 space-y-6">
                 <div className="flex justify-between items-center">
                     <h1 className="text-3xl font-bold tracking-tight">Departments</h1>
@@ -188,7 +167,6 @@ export default function Index({ departments }: Props) {
                                 <TableRow>
                                     <TableHead>ID</TableHead>
                                     <TableHead>Name</TableHead>
-                                    <TableHead>Created At</TableHead>
                                     <TableHead className="text-right">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -199,9 +177,6 @@ export default function Index({ departments }: Props) {
                                             {department.department_id}
                                         </TableCell>
                                         <TableCell>{department.name}</TableCell>
-                                        <TableCell>
-                                            {new Date(department.created_at).toLocaleDateString()}
-                                        </TableCell>
                                         <TableCell className="text-right space-x-2">
                                             <Button
                                                 variant="outline"
@@ -268,7 +243,7 @@ export default function Index({ departments }: Props) {
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={confirmDelete}
-                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            className="bg-destructive text-white hover:bg-destructive/90"
                         >
                             Delete
                         </AlertDialogAction>
