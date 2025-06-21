@@ -73,6 +73,7 @@ Route::post('/enrollments', [App\Http\Controllers\EnrollmentController::class, '
 
 // ClassSession routes
 Route::get('/class-sessions', [App\Http\Controllers\ClassSessionController::class, 'index'])->name('class-sessions.index');
+Route::get('/class-session-detail/{classSession}', [App\Http\Controllers\ClassSessionController::class, 'show'])->name('class-sessions.show');
 Route::post('/class-sessions', [App\Http\Controllers\ClassSessionController::class, 'store'])->name('class-sessions.store');
 Route::put('/class-sessions/{classSession}', [App\Http\Controllers\ClassSessionController::class, 'update'])->name('class-sessions.update');
 Route::delete('/class-sessions/{classSession}', [App\Http\Controllers\ClassSessionController::class, 'destroy'])->name('class-sessions.destroy');

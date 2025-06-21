@@ -344,7 +344,7 @@ export default function ClassSessionPage({ class_sessions, minimal_students, min
                                                 <Button
                                                     variant="outline"
                                                     size="icon"
-                                                    onClick={() => router.get(route('class-sessions.show', session.session_date))}
+                                                    onClick={() => router.get(route('class-sessions.show', session.session_id))}
                                                 >
                                                     <Eye className="h-4 w-4" />
                                                 </Button>
