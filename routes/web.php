@@ -77,6 +77,10 @@ Route::post('/class-sessions', [App\Http\Controllers\ClassSessionController::cla
 Route::put('/class-sessions/{classSession}', [App\Http\Controllers\ClassSessionController::class, 'update'])->name('class-sessions.update');
 Route::delete('/class-sessions/{classSession}', [App\Http\Controllers\ClassSessionController::class, 'destroy'])->name('class-sessions.destroy');
 
+// Attendance routes
+
+Route::post('/attendance', [App\Http\Controllers\AttendanceController::class, 'store'])->name('attendances.store');
+
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {

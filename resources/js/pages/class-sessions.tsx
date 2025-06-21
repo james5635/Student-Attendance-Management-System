@@ -43,10 +43,12 @@ interface ClassSessionPageProps {
 
 type ClassSessionFormData = Omit<ClassSession, 'session_id' | 'class_session_id' | 'class_subject_id' | 'created_at' | 'updated_at'>
     & { subject_id?: number, teacher_id?: number, class_id?: number };
-type AttendanceFormData = Omit<Attendance, 'attendance_id' | 'created_at' | 'updated_at'>;
+type AttendanceFormData = Omit<Attendance, 'attendance_id' | 'session_id' | 'created_at' | 'updated_at'>;
 export default function ClassSessionPage({ class_sessions, minimal_students, minimal_subjects, minimal_teachers, minimal_classes }: ClassSessionPageProps) {
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [isSelectClassSubjectOpen, setIsSelectClassSubjectOpen] = useState(false);
+    const [isCreateAttendanceOpen, setIsCreateAttendanceOpen] = useState(false);
+    const [isSelectStudentOpen, setIsSelectStudentOpen] = useState(false);
 
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [isEditClassSubjectOpen, setIsEditClassSubjectOpen] = useState(false);
@@ -55,9 +57,9 @@ export default function ClassSessionPage({ class_sessions, minimal_students, min
 
     // 
     const form: InertiaFormProps<ClassSessionFormData> = useForm<ClassSessionFormData>({
-        session_date: '', // YYYY-MM-DD
-        start_time: '', // HH:MM:SS
-        end_time: '', // HH:MM:SS
+        session_date: '',
+        start_time: '',
+        end_time: '',
         status: null,
         subject_id: 0,
         teacher_id: 0,
@@ -66,9 +68,17 @@ export default function ClassSessionPage({ class_sessions, minimal_students, min
     const attendenceForm: InertiaFormProps<AttendanceFormData> = useForm<AttendanceFormData>({
         student_id: 0,
         status: '',
-        session_id: 0,
         remarks: null,
     });
+
+    function formatDateToAMPMWithSeconds(date: Date): string {
+        return date.toLocaleTimeString([], {
+            hour: 'numeric',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true,
+        });
+    }
 
     const handleCreateOpenChange = (open: boolean) => {
         setIsCreateOpen(open);
@@ -82,121 +92,83 @@ export default function ClassSessionPage({ class_sessions, minimal_students, min
         e.preventDefault();
 
         console.log('form', form.data);
-        form.post(route("class_sessions.store"), {
+        form.post(route("class-sessions.store"), {
             preserveScroll: true,
             onSuccess: () => {
                 // must set the default to prevent reset to previous submit
                 form.setDefaults({
-                    first_name: '',
-                    last_name: '',
-                    dob: null, // YYYY-MM-DD
-                    gender: null,
-                    email: '',
-                    phone: null,
-                    address: null,
-                    department_id: null,
-                    enrollment_year: null,
+                    session_date: '',
+                    start_time: '',
+                    end_time: '',
                     status: null,
+                    subject_id: 0,
+                    teacher_id: 0,
+                    class_id: 0
                 });
                 form.reset();
-                setIsSelectDepartmentOpen(false);
 
-                console.log('schoolClassFrom', schoolClassFrom.data);
-                schoolClassFrom.post(route('classes.store'), {
+                console.log('attendenceForm', attendenceForm.data);
+                attendenceForm.post(route("attendances.store"), {
+                    preserveScroll: true,
                     onSuccess: () => {
-                        schoolClassFrom.setDefaults({
-                            course_id: 0,
-                            year: 0,
-                            section: '',
-                            advisor_id: null
-                        });
-                        schoolClassFrom.reset();
-
-                        console.log('enrollmentForm', enrollmentForm.data);
-                        enrollmentForm.post(route('enrollments.store'), {
-                            onSuccess: () => {
-                                enrollmentForm.setDefaults({
-                                    enrollment_date: ''
-                                });
-                                enrollmentForm.reset();
-                                setIsCreateEnrollmentOpen(false);
-
-                                toast.success('Enrollment created successfully');
-                            },
-                            onError: (err: Object) => {
-                                Object.values(err).forEach((val) => {
-                                    toast.error(val);
-                                })
-                                // toast.error('Failed to create enrollment');
-                                enrollmentForm.clearErrors();
-                            }
+                        attendenceForm.setDefaults({
+                            student_id: 0,
+                            status: '',
+                            remarks: null,
                         })
+                        attendenceForm.reset();
 
-
-                        toast.success('Class created successfully');
+                        toast.success('Attendance created successfully');
                     },
                     onError: (err: Object) => {
                         Object.values(err).forEach((val) => {
                             toast.error(val);
                         })
-                        // toast.error('Failed to create class');
-                        schoolClassFrom.clearErrors();
+                        // toast.error('Failed to create attendance');
+                        attendenceForm.clearErrors();
                     }
-                });
+                })
 
+                setIsSelectStudentOpen(false);
+                toast.success('ClassSession created successfully');
 
-
-                toast.success('ClassSession created successfully')
             },
             onError: (err: Object) => {
-
                 Object.values(err).forEach((val) => {
                     toast.error(val);
                 })
+                // toast.error('Failed to create class');
                 form.clearErrors();
-
             }
-        })
-
-
+        });
     }
 
-
-    const handleEditClick = (student: ClassSession) => {
-        setselectedClassSession(student);
-
+    const handleEditClick = (session: ClassSession) => {
         form.setData({
-            first_name: student.first_name,
-            last_name: student.last_name,
-            dob: student.dob || null, // YYYY-MM-DD
-            gender: student.gender || null,
-            email: student.email,
-            phone: student.phone || null,
-            address: student.address || null,
-            department_id: student.department_id || null,
-            enrollment_year: student.enrollment_year || null,
-            status: student.status || null,
+            session_date: session.session_date,
+            start_time: session.start_time,
+            end_time: session.end_time,
+            status: session.status,
         });
+        console.log('form', form.data);
+        setselectedClassSession(session)
         setIsEditOpen(true);
     }
     const handleUpdateSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!selectedClassSession) return;
-        form.put(route('class_sessions.update', selectedClassSession.student_id), {
+        form.put(route('class-sessions.update', selectedClassSession.session_id), {
             onSuccess: () => {
                 form.setDefaults({
-                    first_name: '',
-                    last_name: '',
-                    dob: null, // YYYY-MM-DD
-                    gender: null,
-                    email: '',
-                    phone: null,
-                    address: null,
-                    department_id: null,
-                    enrollment_year: null,
+                    session_date: '',
+                    start_time: '',
+                    end_time: '',
                     status: null,
+                    subject_id: 0,
+                    teacher_id: 0,
+                    class_id: 0
                 });
-                setIsEditOpen(false);
+                setIsEditClassSubjectOpen(false);
                 setselectedClassSession(null);
                 form.reset();
                 toast.success('ClassSession updated successfully');
@@ -211,13 +183,13 @@ export default function ClassSessionPage({ class_sessions, minimal_students, min
             }
         });
     };
-    const handleDeleteClick = (subject: ClassSession) => {
-        setselectedClassSession(subject);
+    const handleDeleteClick = (session: ClassSession) => {
+        setselectedClassSession(session);
         setIsDeleteOpen(true);
     }
     const handleOKDeleteClick = () => {
         if (!selectedClassSession) return;
-        router.delete(route('class_sessions.destroy', selectedClassSession.student_id), {
+        router.delete(route('class-sessions.destroy', selectedClassSession.session_id), {
             onSuccess: () => {
                 setIsDeleteOpen(false);
                 setselectedClassSession(null);
@@ -251,106 +223,48 @@ export default function ClassSessionPage({ class_sessions, minimal_students, min
                             <DialogHeader>
                                 <DialogTitle>Add New ClassSession</DialogTitle>
                                 <DialogDescription>
-                                    Create a new student in the system.
+                                    Fill in the details to create a new class session.
                                 </DialogDescription>
                             </DialogHeader>
                             <form className="space-y-4">
                                 <div className="space-y-2">
 
-                                    <Label htmlFor="first_name">First Name</Label>
+                                    <Label htmlFor="session_date">Session Date</Label>
                                     <Input
-                                        id="first_name"
-                                        placeholder="Enter first name"
-                                        value={form.data.first_name}
-                                        onChange={e => form.setData('first_name', e.target.value)}
-                                        required
-                                    />
-                                    {form.errors.first_name && (
-                                        <p className="text-sm text-destructive">{form.errors.first_name}</p>
-                                    )}
-                                    <Label htmlFor="last_name">Last Name</Label>
-                                    <Input
-                                        id="last_name"
-                                        placeholder="Enter last name"
-                                        value={form.data.last_name}
-                                        onChange={e => form.setData('last_name', e.target.value)}
-                                        required
-                                    />
-                                    {form.errors.last_name && (
-                                        <p className="text-sm text-destructive">{form.errors.last_name}</p>
-                                    )}
-                                    <Label htmlFor="dob">Date of Birth</Label>
-                                    <Input
-                                        id="dob"
+                                        id="session_date"
                                         type="date"
                                         placeholder="YYYY-MM-DD"
-                                        value={form.data.dob || ''}
-                                        onChange={e => form.setData('dob', e.target.value)}
+                                        value={form.data.session_date}
+                                        onChange={e => form.setData('session_date', e.target.value)}
                                         required
                                     />
-                                    {form.errors.dob && (
-                                        <p className="text-sm text-destructive">{form.errors.dob}</p>
+                                    {form.errors.session_date && (
+                                        <p className="text-sm text-destructive">{form.errors.session_date}</p>
                                     )}
-                                    <Label htmlFor="gender">Gender</Label>
-                                    <Select
-                                        onValueChange={(val) => form.setData('gender', val)}
-                                        value={form.data.gender || undefined}
-                                    >
-                                        <SelectTrigger id="gender">
-                                            <SelectValue placeholder="Select gender" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="Male">Male</SelectItem>
-                                            <SelectItem value="Female">Female</SelectItem>
-                                            <SelectItem value="Other">Other</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    {form.errors.gender && (
-                                        <p className="text-sm text-destructive">{form.errors.gender}</p>
-                                    )}
-                                    <Label htmlFor="email">Email</Label>
+                                    <Label htmlFor="start_time">Start Time</Label>
                                     <Input
-                                        id="email"
-                                        type="email"
-                                        placeholder="Enter email"
-                                        value={form.data.email}
-                                        onChange={e => form.setData('email', e.target.value)}
+                                        id="start_time"
+                                        type="time"
+                                        placeholder="HH:MM"
+                                        // step={"1"}
+                                        value={form.data.start_time}
+                                        onChange={e => form.setData('start_time', e.target.value)}
                                         required
                                     />
-                                    {form.errors.email && (
-                                        <p className="text-sm text-destructive">{form.errors.email}</p>
+                                    {form.errors.start_time && (
+                                        <p className="text-sm text-destructive">{form.errors.start_time}</p>
                                     )}
-                                    <Label htmlFor="phone">Phone</Label>
+                                    <Label htmlFor="end_time">End Time</Label>
                                     <Input
-                                        id="phone"
-                                        type="tel"
-                                        placeholder="Enter phone number"
-                                        value={form.data.phone || ''}
-                                        onChange={e => form.setData('phone', e.target.value)}
+                                        id="end_time"
+                                        type="time"
+                                        placeholder="HH:MM"
+                                        value={form.data.end_time}
+                                        onChange={e => form.setData('end_time', e.target.value)}
+                                        required
                                     />
-                                    {form.errors.phone && (
-                                        <p className="text-sm text-destructive">{form.errors.phone}</p>
-                                    )}
-                                    <Label htmlFor="address">Address</Label>
-                                    <Input
-                                        id="address"
-                                        placeholder="Enter address"
-                                        value={form.data.address || ''}
-                                        onChange={e => form.setData('address', e.target.value)}
-                                    />
-                                    {form.errors.address && (
-                                        <p className="text-sm text-destructive">{form.errors.address}</p>
-                                    )}
-                                    <Label htmlFor="enrollment_year">Enrollment Year</Label>
-                                    <Input
-                                        id="enrollment_year"
-                                        type="number"
-                                        placeholder="Enter enrollment year"
-                                        value={form.data.enrollment_year || ''}
-                                        onChange={e => form.setData('enrollment_year', e.target.value ? parseInt(e.target.value) : null)}
-                                    />
-                                    {form.errors.enrollment_year && (
-                                        <p className="text-sm text-destructive">{form.errors.enrollment_year}</p>
+                                    {form.errors.end_time && (
+                                        <p className="text-sm text-destructive">{form.errors.end_time}</p>
                                     )}
                                     <Label htmlFor="status">Status</Label>
                                     <Select
@@ -363,14 +277,17 @@ export default function ClassSessionPage({ class_sessions, minimal_students, min
                                         <SelectContent>
                                             <SelectItem value="Active">Active</SelectItem>
                                             <SelectItem value="Inactive">Inactive</SelectItem>
+                                            <SelectItem value="Cancelled">Cancelled</SelectItem>
+                                            <SelectItem value="Completed">Completed</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     {form.errors.status && (
                                         <p className="text-sm text-destructive">{form.errors.status}</p>
                                     )}
+
                                 </div>
                                 <DialogFooter>
-                                    <Button onClick={(e) => { e.preventDefault(); setIsCreateOpen(false); setIsSelectDepartmentOpen(true) }} disabled={form.processing}>
+                                    <Button onClick={(e) => { e.preventDefault(); setIsCreateOpen(false); setIsSelectClassSubjectOpen(true) }} disabled={form.processing}>
                                         Next
                                     </Button>
                                 </DialogFooter>
@@ -391,62 +308,64 @@ export default function ClassSessionPage({ class_sessions, minimal_students, min
                                 <TableRow>
 
                                     <TableHead>ID</TableHead>
-                                    <TableHead>Department ID</TableHead>
-                                    <TableHead>First Name</TableHead>
-                                    <TableHead>Last Name</TableHead>
-                                    <TableHead>Date of Birth</TableHead>
-                                    <TableHead>Gender</TableHead>
-                                    <TableHead>Email</TableHead>
-                                    <TableHead>Phone</TableHead>
-                                    <TableHead>Address</TableHead>
-                                    <TableHead>Enrollment Year</TableHead>
+                                    <TableHead>Session Date</TableHead>
+                                    <TableHead>Start Time</TableHead>
+                                    <TableHead>End Time</TableHead>
                                     <TableHead>Status</TableHead>
-
-
                                     <TableHead className="text-right">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
 
-                                {class_sessions.map(student => (
-                                    <TableRow key={student.student_id}>
-                                        <TableCell>{student.student_id}</TableCell>
-                                        <TableCell>{student.department_id}</TableCell>
-                                        <TableCell>{student.first_name}</TableCell>
-                                        <TableCell>{student.last_name}</TableCell>
-                                        <TableCell>{student.dob || 'N/A'}</TableCell>
-                                        <TableCell>{student.gender || 'N/A'}</TableCell>
-                                        <TableCell>{student.email}</TableCell>
-                                        <TableCell>{student.phone || 'N/A'}</TableCell>
-                                        <TableCell>{student.address || 'N/A'}</TableCell>
-                                        <TableCell>{student.enrollment_year || 'N/A'}</TableCell>
-                                        <TableCell>{student.status || 'N/A'}</TableCell>
-                                        <TableCell className="text-right space-x-2">
-                                            <Button
-                                                variant="outline"
-                                                size="icon"
-                                                onClick={() => router.get(route('class_sessions.show', student.student_id))}
-                                            >
-                                                <Eye className="h-4 w-4" />
-                                            </Button>
-                                            <Button
-                                                variant="outline"
-                                                size="icon"
-                                                onClick={() => handleEditClick(student)}
-                                            >
-                                                <Pencil className="h-4 w-4" />
-                                            </Button>
-                                            <Button
-                                                variant="destructive"
-                                                size="icon"
-                                                onClick={() => handleDeleteClick(student)}
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </Button>
+                                {
+                                    class_sessions.map((session, index) => (
+                                        <TableRow key={index}>
+                                            <TableCell>{session.session_id}</TableCell>
+                                            <TableCell>{session.session_date}</TableCell>
+                                            <TableCell>{
+                                                (() => {
+                                                    let date = new Date();
+                                                    let hour_minute_second: [number, number, number] = session.start_time.split(':').map(x => parseInt(x)) as [number, number, number];
+                                                    date.setHours(...hour_minute_second)
+                                                    return formatDateToAMPMWithSeconds(date);
+                                                })()
+                                            }</TableCell>
+                                            <TableCell>{
+                                                (() => {
+                                                    let date = new Date();
+                                                    let hour_minute_second: [number, number, number] = session.end_time.split(':').map(x => parseInt(x)) as [number, number, number];
+                                                    date.setHours(...hour_minute_second)
+                                                    return formatDateToAMPMWithSeconds(date);
+                                                })()
+                                            }</TableCell>
+                                            <TableCell>{session.status}</TableCell>
 
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
+                                            <TableCell className="text-right space-x-2">
+                                                <Button
+                                                    variant="outline"
+                                                    size="icon"
+                                                    onClick={() => router.get(route('class-sessions.show', session.session_date))}
+                                                >
+                                                    <Eye className="h-4 w-4" />
+                                                </Button>
+                                                <Button
+                                                    variant="outline"
+                                                    size="icon"
+                                                    onClick={() => handleEditClick(session)}
+                                                >
+                                                    <Pencil className="h-4 w-4" />
+                                                </Button>
+                                                <Button
+                                                    variant="destructive"
+                                                    size="icon"
+                                                    onClick={() => handleDeleteClick(session)}
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
 
                             </TableBody>
                         </Table>
@@ -454,155 +373,52 @@ export default function ClassSessionPage({ class_sessions, minimal_students, min
                 </Card>
             </div>
 
-            <Dialog open={isSelectDepartmentOpen} onOpenChange={setIsSelectDepartmentOpen}>
+            <Dialog open={isSelectClassSubjectOpen} onOpenChange={setIsSelectClassSubjectOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Select Department</DialogTitle>
+                        <DialogTitle>Select Class Subject</DialogTitle>
                         <DialogDescription>
-                            Choose a department to associate with the student.
+                            Please select a class subject to proceed with creating a class session.
                         </DialogDescription>
                     </DialogHeader>
                     <form className="space-y-4">
                         <div className="space-y-2">
-                            <Label htmlFor="department_id">Department ID</Label>
+                            <Label htmlFor="department_id">Subject ID</Label>
                             <Select onValueChange={(val) => {
-                                let found: Minimal_Department | undefined = minimal_departments.find(mc => mc.department_id === parseInt(val)); // must use this semicolon to distingush the calling function ()
-                                (document.getElementById("department name") as HTMLInputElement)!.value = found!.name
-                                form.setData('department_id', parseInt(val));
+                                let found: Minimal_Subject | undefined = minimal_subjects!.find(m => m.subject_id === parseInt(val)); // must use this semicolon to distingush the calling function ()
+                                (document.getElementById("subject name") as HTMLInputElement)!.value = found!.name
+                                form.setData('subject_id', parseInt(val));
                             }}>
-                                <SelectTrigger id="department_id">
-                                    <SelectValue placeholder="Select a department" />
+                                <SelectTrigger id="subject_id">
+                                    <SelectValue placeholder="Select a subject" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {
-                                        minimal_departments.map(x =>
-                                            <SelectItem key={x.department_id} value={x.department_id.toString()}>
-                                                {x.department_id}
+                                        minimal_subjects!.map(x =>
+                                            <SelectItem key={x.subject_id} value={x.subject_id.toString()}>
+                                                {x.subject_id}
                                             </SelectItem>
                                         )
                                     }
                                 </SelectContent>
                             </Select>
-                            <Label>Department Name</Label>
-                            <Input id="department name" readOnly></Input>
+                            <Label>Subject Name</Label>
+                            <Input id="subject name" readOnly></Input>
 
                         </div>
-                        <DialogFooter>
-                            <Button onClick={(e) => { e.preventDefault(); setIsSelectDepartmentOpen(false); setIsCreateClassOpen(true) }} disabled={form.processing}>
-                                Next
-                            </Button>
-                        </DialogFooter>
-                    </form>
-                </DialogContent>
-            </Dialog>
-
-            <Dialog open={isCreateClassOpen} onOpenChange={setIsCreateClassOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Create Class</DialogTitle>
-                        <DialogDescription>
-                            Create a new class for the student.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <form className="space-y-4">
-                        <div>
-                            <Label>Year</Label>
-                            <Input
-                                type="number"
-                                placeholder="Enter year"
-                                value={schoolClassFrom.data.year || ''}
-                                onChange={e => schoolClassFrom.setData('year', e.target.value ? parseInt(e.target.value) : 0)}
-                                required
-                            />
-                            {schoolClassFrom.errors.year && (
-                                <p className="text-sm text-destructive">{schoolClassFrom.errors.year}</p>
-                            )}
-                            <Label>Section</Label>
-                            <Input
-                                placeholder="Enter section"
-                                value={schoolClassFrom.data.section || ''}
-                                onChange={e => schoolClassFrom.setData('section', e.target.value)}
-                                required
-                            />
-                            {schoolClassFrom.errors.section && (
-                                <p className="text-sm text-destructive">{schoolClassFrom.errors.section}</p>
-                            )}
-                        </div>
-
-                        <DialogFooter>
-                            <Button onClick={(e) => { e.preventDefault(); setIsCreateClassOpen(false); setIsSelectCourseOpen(true) }} disabled={form.processing}>
-                                Next
-                            </Button>
-                        </DialogFooter>
-                    </form>
-                </DialogContent>
-            </Dialog>
-
-            <Dialog open={isSelectCourseOepn} onOpenChange={setIsSelectCourseOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Select Course</DialogTitle>
-                        <DialogDescription>
-                            Choose a course to associate with the student.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <form className="space-y-4">
                         <div className="space-y-2">
-                            <Label htmlFor="course_id">Course ID</Label>
+                            <Label htmlFor="teacher_id">Subject ID</Label>
                             <Select onValueChange={(val) => {
-                                let found: Minimal_Course | undefined = minimal_courses.find(mc => mc.course_id === parseInt(val)); // must use this semicolon to distingush the calling function ()
-                                (document.getElementById("course name") as HTMLInputElement)!.value = found!.name
-                                schoolClassFrom.setData('course_id', parseInt(val));
-                            }}>
-                                <SelectTrigger id="course_id">
-                                    <SelectValue placeholder="Select a department" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {
-                                        minimal_courses.map(x =>
-                                            <SelectItem key={x.course_id} value={x.course_id.toString()}>
-                                                {x.course_id}
-                                            </SelectItem>
-                                        )
-                                    }
-                                </SelectContent>
-                            </Select>
-                            <Label>Course Name</Label>
-                            <Input id="course name" readOnly></Input>
-
-                        </div>
-                        <DialogFooter>
-                            <Button onClick={(e) => { e.preventDefault(); setIsSelectCourseOpen(false); setIsSelectTeacherOpen(true) }} disabled={form.processing}>
-                                Next
-                            </Button>
-                        </DialogFooter>
-                    </form>
-                </DialogContent>
-            </Dialog>
-
-
-            <Dialog open={isSelectTeacherOpen} onOpenChange={setIsSelectTeacherOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Select Teacher</DialogTitle>
-                        <DialogDescription>
-                            Choose a teacher to assign as the class advisor for the student.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <form className="space-y-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="course_id">Course ID</Label>
-                            <Select onValueChange={(val) => {
-                                let found: Minimal_Teacher | undefined = minimal_teachers.find(mc => mc.teacher_id === parseInt(val)); // must use this semicolon to distingush the calling function ()
-                                (document.getElementById("teacher name") as HTMLInputElement)!.value = `${found!.first_name} ${found!.last_name}`;
-                                schoolClassFrom.setData('advisor_id', parseInt(val));
+                                let found: Minimal_Teacher | undefined = minimal_teachers!.find(m => m.teacher_id === parseInt(val)); // must use this semicolon to distingush the calling function ()
+                                (document.getElementById("teacher name") as HTMLInputElement)!.value = found!.teacher_name
+                                form.setData('teacher_id', parseInt(val));
                             }}>
                                 <SelectTrigger id="teacher_id">
-                                    <SelectValue placeholder="Select a department" />
+                                    <SelectValue placeholder="Select a teacher" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {
-                                        minimal_teachers.map(x =>
+                                        minimal_teachers!.map(x =>
                                             <SelectItem key={x.teacher_id} value={x.teacher_id.toString()}>
                                                 {x.teacher_id}
                                             </SelectItem>
@@ -614,36 +430,119 @@ export default function ClassSessionPage({ class_sessions, minimal_students, min
                             <Input id="teacher name" readOnly></Input>
 
                         </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="">Class ID</Label>
+                            <Select onValueChange={(val) => {
+                                form.setData('class_id', parseInt(val));
+                            }}>
+                                <SelectTrigger id="class_id">
+                                    <SelectValue placeholder="Select a teacher" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {
+                                        minimal_classes!.map(x =>
+                                            <SelectItem key={x.class_id} value={x.class_id.toString()}>
+                                                {x.class_id}
+                                            </SelectItem>
+                                        )
+                                    }
+                                </SelectContent>
+                            </Select>
+
+
+                        </div>
                         <DialogFooter>
-                            <Button onClick={(e) => { e.preventDefault(); setIsSelectTeacherOpen(false); setIsCreateEnrollmentOpen(true) }} disabled={form.processing}>
+                            <Button onClick={(e) => { e.preventDefault(); setIsSelectClassSubjectOpen(false); setIsCreateAttendanceOpen(true) }} disabled={form.processing}>
                                 Next
                             </Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>
             </Dialog>
-            <Dialog open={isCreateEnrollmentOpen} onOpenChange={setIsCreateEnrollmentOpen}>
+
+
+            <Dialog open={isCreateAttendanceOpen} onOpenChange={setIsCreateAttendanceOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Create Enrollment</DialogTitle>
+                        <DialogTitle>Create Attendance</DialogTitle>
                         <DialogDescription>
-                            Enroll the student
+                            Please create attendance for the class session.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <form className="space-y-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="status">Status</Label>
+                            <Select
+                                onValueChange={(val) => attendenceForm.setData('status', val)}
+                                value={attendenceForm.data.status || undefined}
+                            >
+                                <SelectTrigger id="status">
+                                    <SelectValue placeholder="Select status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Present">Present</SelectItem>
+                                    <SelectItem value="Absent">Absent</SelectItem>
+                                    <SelectItem value="Late">Late</SelectItem>
+                                </SelectContent>
+                            </Select>
+
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="remark">Remark</Label>
+                            <Input
+                                id="remark"
+                                placeholder="Enter remark"
+                                value={attendenceForm.data.remarks!}
+                                onChange={e => attendenceForm.setData('remarks', e.target.value)}
+                                required
+                            />
+
+                        </div>
+
+                        <DialogFooter>
+                            <Button onClick={(e) => { e.preventDefault(); setIsCreateAttendanceOpen(false); setIsSelectStudentOpen(true) }} disabled={form.processing}>
+                                Next
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
+
+
+            <Dialog open={isSelectStudentOpen} onOpenChange={setIsSelectStudentOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Select Student</DialogTitle>
+                        <DialogDescription>
+                            Please select a student to proceed with creating attendance for the class session.
                         </DialogDescription>
                     </DialogHeader>
                     <form onSubmit={handleCreateSubmit} className="space-y-4">
-                        <div>
-                            <Label>Enrollment Date</Label>
-                            <Input
-                                type="date"
-                                placeholder="YYYY-MM-DD"
-                                value={enrollmentForm.data.enrollment_date || ''}
-                                onChange={e => enrollmentForm.setData('enrollment_date', e.target.value)}
-                                required
-                            />
-                            {enrollmentForm.errors.enrollment_date && (
-                                <p className="text-sm text-destructive">{enrollmentForm.errors.enrollment_date}</p>
-                            )}
+                        <div className="space-y-2">
+                            <Label htmlFor="student_id">Student ID</Label>
+                            <Select onValueChange={(val) => {
+                                let found: Minimal_Student | undefined = minimal_students!.find(m => m.student_id === parseInt(val)); // must use this semicolon to distingush the calling function ()
+                                (document.getElementById("student name") as HTMLInputElement)!.value = found!.student_name
+                                attendenceForm.setData('student_id', parseInt(val));
+                            }}>
+                                <SelectTrigger id="student_id">
+                                    <SelectValue placeholder="Select a student" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {
+                                        minimal_students!.map(x =>
+                                            <SelectItem key={x.student_id} value={x.student_id.toString()}>
+                                                {x.student_id}
+                                            </SelectItem>
+                                        )
+                                    }
+                                </SelectContent>
+                            </Select>
+                            <Label>Student Name</Label>
+                            <Input id="student name" readOnly></Input>
+
                         </div>
+
 
                         <DialogFooter>
                             <Button type='submit' disabled={form.processing}>
@@ -653,133 +552,56 @@ export default function ClassSessionPage({ class_sessions, minimal_students, min
                     </form>
                 </DialogContent>
             </Dialog>
+
             <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Edit student</DialogTitle>
+                        <DialogTitle>Edit Session</DialogTitle>
                         <DialogDescription>
-                            Update the student information.
+                            Update the session information.
                         </DialogDescription>
                     </DialogHeader>
-                    <form onSubmit={handleUpdateSubmit} className="space-y-4">
+                    <form className="space-y-4">
                         <div className="space-y-2">
                             <div className="space-y-2">
-                                <Label htmlFor="department_id">Department ID</Label>
-                                <Select onValueChange={(val) => {
-                                    form.setData('department_id', parseInt(val));
-                                }}>
-                                    <SelectTrigger id="department_id">
-                                        <SelectValue placeholder="Select a department" />
-                                    </SelectTrigger>
-                                    <SelectContent >
-                                        {
-                                            minimal_departments.map(x =>
-                                                <SelectItem key={x.department_id} value={x.department_id.toString()}>
-                                                    {x.department_id}
-                                                </SelectItem>
-                                            )
-                                        }
-                                    </SelectContent>
-                                </Select>
 
-                            </div>
-                            <div className="space-y-2">
-
-                                <Label htmlFor="first_name">First Name</Label>
+                                <Label htmlFor="session_date">Session Date</Label>
                                 <Input
-                                    id="first_name"
-                                    placeholder="Enter first name"
-                                    value={form.data.first_name}
-                                    onChange={e => form.setData('first_name', e.target.value)}
-                                    required
-                                />
-                                {form.errors.first_name && (
-                                    <p className="text-sm text-destructive">{form.errors.first_name}</p>
-                                )}
-                                <Label htmlFor="last_name">Last Name</Label>
-                                <Input
-                                    id="last_name"
-                                    placeholder="Enter last name"
-                                    value={form.data.last_name}
-                                    onChange={e => form.setData('last_name', e.target.value)}
-                                    required
-                                />
-                                {form.errors.last_name && (
-                                    <p className="text-sm text-destructive">{form.errors.last_name}</p>
-                                )}
-                                <Label htmlFor="dob">Date of Birth</Label>
-                                <Input
-                                    id="dob"
+                                    id="session_date"
                                     type="date"
                                     placeholder="YYYY-MM-DD"
-                                    value={form.data.dob || ''}
-                                    onChange={e => form.setData('dob', e.target.value)}
+                                    value={form.data.session_date}
+                                    onChange={e => form.setData('session_date', e.target.value)}
                                     required
                                 />
-                                {form.errors.dob && (
-                                    <p className="text-sm text-destructive">{form.errors.dob}</p>
+                                {form.errors.session_date && (
+                                    <p className="text-sm text-destructive">{form.errors.session_date}</p>
                                 )}
-                                <Label htmlFor="gender">Gender</Label>
-                                <Select
-                                    onValueChange={(val) => form.setData('gender', val)}
-                                    value={form.data.gender || undefined}
-                                >
-                                    <SelectTrigger id="gender">
-                                        <SelectValue placeholder="Select gender" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="Male">Male</SelectItem>
-                                        <SelectItem value="Female">Female</SelectItem>
-                                        <SelectItem value="Other">Other</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                {form.errors.gender && (
-                                    <p className="text-sm text-destructive">{form.errors.gender}</p>
-                                )}
-                                <Label htmlFor="email">Email</Label>
+                                <Label htmlFor="start_time">Start Time</Label>
                                 <Input
-                                    id="email"
-                                    type="email"
-                                    placeholder="Enter email"
-                                    value={form.data.email}
-                                    onChange={e => form.setData('email', e.target.value)}
+                                    id="start_time"
+                                    type="time"
+                                    placeholder="HH:MM:SS"
+                                    value={form.data.start_time}
+                                    onChange={e => form.setData('start_time', e.target.value)}
                                     required
                                 />
-                                {form.errors.email && (
-                                    <p className="text-sm text-destructive">{form.errors.email}</p>
+                                {form.errors.start_time && (
+                                    <p className="text-sm text-destructive">{form.errors.start_time}</p>
                                 )}
-                                <Label htmlFor="phone">Phone</Label>
+                                <Label htmlFor="end_time">End Time</Label>
                                 <Input
-                                    id="phone"
-                                    type="tel"
-                                    placeholder="Enter phone number"
-                                    value={form.data.phone || ''}
-                                    onChange={e => form.setData('phone', e.target.value)}
+                                    id="end_time"
+                                    type="time"
+                                    placeholder="HH:MM:SS"
+                                    value={form.data.end_time}
+                                    onChange={e => form.setData('end_time', e.target.value)}
+                                    required
                                 />
-                                {form.errors.phone && (
-                                    <p className="text-sm text-destructive">{form.errors.phone}</p>
+                                {form.errors.end_time && (
+                                    <p className="text-sm text-destructive">{form.errors.end_time}</p>
                                 )}
-                                <Label htmlFor="address">Address</Label>
-                                <Input
-                                    id="address"
-                                    placeholder="Enter address"
-                                    value={form.data.address || ''}
-                                    onChange={e => form.setData('address', e.target.value)}
-                                />
-                                {form.errors.address && (
-                                    <p className="text-sm text-destructive">{form.errors.address}</p>
-                                )}
-                                <Label htmlFor="enrollment_year">Enrollment Year</Label>
-                                <Input
-                                    id="enrollment_year"
-                                    type="number"
-                                    placeholder="Enter enrollment year"
-                                    value={form.data.enrollment_year || ''}
-                                    onChange={e => form.setData('enrollment_year', e.target.value ? parseInt(e.target.value) : null)}
-                                />
-                                {form.errors.enrollment_year && (
-                                    <p className="text-sm text-destructive">{form.errors.enrollment_year}</p>
-                                )}
+
                                 <Label htmlFor="status">Status</Label>
                                 <Select
                                     onValueChange={(val) => form.setData('status', val)}
@@ -791,16 +613,105 @@ export default function ClassSessionPage({ class_sessions, minimal_students, min
                                     <SelectContent>
                                         <SelectItem value="Active">Active</SelectItem>
                                         <SelectItem value="Inactive">Inactive</SelectItem>
+                                        <SelectItem value="Cancelled">Cancelled</SelectItem>
+                                        <SelectItem value="Completed">Completed</SelectItem>
                                     </SelectContent>
                                 </Select>
                                 {form.errors.status && (
                                     <p className="text-sm text-destructive">{form.errors.status}</p>
                                 )}
+
                             </div>
                         </div>
                         <DialogFooter>
+                            <Button onClick={(e) => { e.preventDefault(); setIsEditOpen(false); setIsEditClassSubjectOpen(true) }} disabled={form.processing}>
+                                Next
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
+            <Dialog open={isEditClassSubjectOpen} onOpenChange={setIsEditClassSubjectOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Select Class Subject</DialogTitle>
+                        <DialogDescription>
+                            Please select a class subject to proceed with creating a class session.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={handleUpdateSubmit} className="space-y-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="department_id">Subject ID</Label>
+                            <Select onValueChange={(val) => {
+                                let found: Minimal_Subject | undefined = minimal_subjects!.find(m => m.subject_id === parseInt(val)); // must use this semicolon to distingush the calling function ()
+                                (document.getElementById("subject name") as HTMLInputElement)!.value = found!.name
+                                form.setData('subject_id', parseInt(val));
+                            }}>
+                                <SelectTrigger id="subject_id">
+                                    <SelectValue placeholder="Select a subject" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {
+                                        minimal_subjects!.map(x =>
+                                            <SelectItem key={x.subject_id} value={x.subject_id.toString()}>
+                                                {x.subject_id}
+                                            </SelectItem>
+                                        )
+                                    }
+                                </SelectContent>
+                            </Select>
+                            <Label>Subject Name</Label>
+                            <Input id="subject name" readOnly></Input>
+
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="teacher_id">Subject ID</Label>
+                            <Select onValueChange={(val) => {
+                                let found: Minimal_Teacher | undefined = minimal_teachers!.find(m => m.teacher_id === parseInt(val)); // must use this semicolon to distingush the calling function ()
+                                (document.getElementById("teacher name") as HTMLInputElement)!.value = found!.teacher_name
+                                form.setData('teacher_id', parseInt(val));
+                            }}>
+                                <SelectTrigger id="teacher_id">
+                                    <SelectValue placeholder="Select a teacher" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {
+                                        minimal_teachers!.map(x =>
+                                            <SelectItem key={x.teacher_id} value={x.teacher_id.toString()}>
+                                                {x.teacher_id}
+                                            </SelectItem>
+                                        )
+                                    }
+                                </SelectContent>
+                            </Select>
+                            <Label>Teacher Name</Label>
+                            <Input id="teacher name" readOnly></Input>
+
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="">Class ID</Label>
+                            <Select onValueChange={(val) => {
+                                form.setData('class_id', parseInt(val));
+                            }}>
+                                <SelectTrigger id="class_id">
+                                    <SelectValue placeholder="Select a teacher" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {
+                                        minimal_classes!.map(x =>
+                                            <SelectItem key={x.class_id} value={x.class_id.toString()}>
+                                                {x.class_id}
+                                            </SelectItem>
+                                        )
+                                    }
+                                </SelectContent>
+                            </Select>
+
+
+                        </div>
+                        <DialogFooter>
                             <Button type="submit" disabled={form.processing}>
-                                Update ClassSession
+                                Submit
                             </Button>
                         </DialogFooter>
                     </form>

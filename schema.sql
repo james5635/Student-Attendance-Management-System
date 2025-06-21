@@ -222,9 +222,9 @@ CREATE TABLE `class_sessions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
--- db_Student_Attendance_Management_System.attendance definition
+-- db_Student_Attendance_Management_System.attendances definition
 
-CREATE TABLE `attendance` (
+CREATE TABLE `attendances` (
   `attendance_id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `session_id` bigint unsigned NOT NULL,
   `student_id` bigint unsigned NOT NULL,
@@ -388,8 +388,8 @@ INSERT INTO `class_sessions` (`session_id`, `class_subject_id`, `session_date`, 
 (9, 6, '2025-06-13', '11:00:00', '12:30:00', 'Completed', NOW(), NOW()), -- English
 (10, 10, '2025-06-12', '13:00:00', '14:30:00', 'Completed', NOW(), NOW()); -- Econ
 
--- Records for 'attendance' table
-INSERT INTO `attendance` (`attendance_id`, `session_id`, `student_id`, `status`, `remarks`, `created_at`, `updated_at`) VALUES
+-- Records for 'attendances' table
+INSERT INTO `attendances` (`attendance_id`, `session_id`, `student_id`, `status`, `remarks`, `created_at`, `updated_at`) VALUES
 (1, 1, 1, 'Present', NULL, NOW(), NOW()),
 (2, 1, 2, 'Present', NULL, NOW(), NOW()),
 (3, 2, 1, 'Present', NULL, NOW(), NOW()),
