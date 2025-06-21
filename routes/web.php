@@ -82,6 +82,11 @@ Route::delete('/class-sessions/{classSession}', [App\Http\Controllers\ClassSessi
 
 Route::post('/attendance', [App\Http\Controllers\AttendanceController::class, 'store'])->name('attendances.store');
 
+// Fee-installment route
+Route::get('/fee-installments', [App\Http\Controllers\FeeInstallmentController::class, 'index'])->name('fee-installments.index');
+Route::post('/fee-installments', [App\Http\Controllers\FeeInstallmentController::class, 'store'])->name('fee-installments.store');
+Route::put('/fee-installments/{student_id}/{installment_no}', [App\Http\Controllers\FeeInstallmentController::class, 'update'])->name('fee-installments.update');
+Route::delete('/fee-installments/{student_id}/{installment_no}', [App\Http\Controllers\FeeInstallmentController::class, 'destroy'])->name('fee-installments.destroy');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {

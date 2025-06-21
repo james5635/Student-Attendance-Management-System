@@ -10,6 +10,7 @@ export default function Start() {
         { href: "/teachers", label: "Teacher" },
         { href: "/students", label: "Student" },
         { href: "/class-sessions", label: "ClassSession" },
+        { href: "/fee-installments", label: "FeeInstallment" },
         
                     
     ];

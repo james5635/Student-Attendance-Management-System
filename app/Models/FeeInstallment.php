@@ -3,12 +3,16 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Thiagoprz\CompositeKey\HasCompositeKey;
 
 class FeeInstallment extends Model
 {
-    protected $primaryKey = ['student_id', 'installment_no'];
+    use HasCompositeKey;
+    // Laravel doesn't natively support composite primary key
+    public $primaryKey = ['student_id', 'installment_no'];
     public $incrementing = false;
-    protected $fillable = ['student_id', 'installment_no', 'amount', 'due_date', 'payment_date', 'status'];
+    public $fillable = ['student_id', 'installment_no', 'amount', 'due_date', 'payment_date', 'status'];
+    // public $fillable = [ 'amount', 'due_date', 'payment_date', 'status'];
 
     public $timestamps = true;
 

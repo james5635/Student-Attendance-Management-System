@@ -80,7 +80,7 @@ export interface Enrollment {
 export interface FeeInstallment {
   student_id: number;
   installment_no: number;
-  amount: string; // stored as decimal(10,2), use string for precision
+  amount: number; // stored as decimal(10,2), use string for precision
   due_date: string; // YYYY-MM-DD
   payment_date?: string | null;
   status?: string | null;
