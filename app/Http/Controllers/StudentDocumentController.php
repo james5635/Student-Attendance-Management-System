@@ -41,4 +41,31 @@ class StudentDocumentController extends Controller
 
         return redirect()->back()->with('success', 'Document uploaded successfully.');
     }
+    public function update(Request $request, $student_id, $document_type)
+    {
+        $student_document = StudentDocument::find([$student_id, $document_type]);
+        // dump($request->all());
+        $request->validate([
+            'file' => 'required|file|max:2048', // max 2MB
+            'issue_date' => 'required|date',
+            'submitted_date' => 'required|date',
+        ]);
+
+        $path = $request->file('file')->store('student_documents', 'public');
+
+        // Save to DB (assuming StudentDocument model exists)
+        $student_document->update([
+            'file_path' => $path,
+            'issue_date' => $request->issue_date,
+            'submitted_date' => $request->submitted_date,
+        ]);
+
+        return redirect()->back()->with('success', 'Document updated successfully.');
+    }
+    public function destroy($student_id, $document_type)
+    {
+        $student_document = StudentDocument::find([$student_id, $document_type]);
+        $student_document->delete();
+        return redirect()->back()->with('success', 'Document deleted successfully.');
+    }
 }

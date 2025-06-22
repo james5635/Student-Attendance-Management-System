@@ -116,32 +116,59 @@ export default function StudentDocumentPage({ student_documents, minimal_student
         e.preventDefault();
         if (!selectedStudentDocument) return;
         console.log(form.data)
-        console.log(route('student_documents.update', [selectedStudentDocument.student_id, selectedStudentDocument.document_type]))
-        form.put(route('student_documents.update', [selectedStudentDocument.student_id, selectedStudentDocument.document_type]),
+        let url: string = route('student-documents.update', [selectedStudentDocument.student_id, selectedStudentDocument.document_type])
+        console.log(url)
+        // form.put(url,
+        //     {
+        //         preserveScroll: true,
+        //         fresh: true,
+        //         forceFormData: true, // Needed for file uploads with Inertia
+        //         onSuccess: () => {
+        //             form.setDefaults({
+        //                 student_id: 0,
+        //                 document_type: '',
+        //                 file: null,
+        //                 issue_date: '',
+        //                 submitted_date: null,
+        //             });
+        //             setIsEditOpen(false);
+        //             setselectedStudentDocument(null);
+        //             form.reset();
+        //             toast.success('StudentDocument updated successfully');
+        //         },
+        //         onError: (err: Object) => {
+        //             Object.values(err).forEach((val) => {
+        //                 toast.error(val);
+        //             })
+        //             // toast.error('Failed to update subject');
+        //             form.clearErrors();
 
-            {
-                onSuccess: () => {
-                    form.setDefaults({
-                        student_id: 0,
-                        document_type: '',
-                        file: null,
-                        issue_date: '',
-                        submitted_date: null,
-                    });
-                    setIsEditOpen(false);
-                    setselectedStudentDocument(null);
-                    form.reset();
-                    toast.success('StudentDocument updated successfully');
-                },
-                onError: (err: Object) => {
-                    Object.values(err).forEach((val) => {
-                        toast.error(val);
-                    })
-                    // toast.error('Failed to update subject');
-                    form.clearErrors();
+        //         }
+        //     });
+        router.post(url, { _method: 'put', ...form.data }, {
+            forceFormData: true, // Needed for file uploads with Inertia
+            onSuccess: () => {
+                form.setDefaults({
+                    student_id: 0,
+                    document_type: '',
+                    file: null,
+                    issue_date: '',
+                    submitted_date: null,
+                });
+                setIsEditOpen(false);
+                setselectedStudentDocument(null);
+                form.reset();
+                toast.success('Student Document updated successfully');
+            },
+            onError: (err: Object) => {
+                Object.values(err).forEach((val) => {
+                    toast.error(val);
+                })
+                // toast.error('Failed to update subject');
+                form.clearErrors();
+            }
+        })
 
-                }
-            });
     };
     const handleDeleteClick = (subject: StudentDocument) => {
         setselectedStudentDocument(subject);
@@ -149,11 +176,11 @@ export default function StudentDocumentPage({ student_documents, minimal_student
     }
     const handleOKDeleteClick = () => {
         if (!selectedStudentDocument) return;
-        router.delete(route('student_documents.destroy', [selectedStudentDocument.student_id, selectedStudentDocument.installment_no]), {
+        router.delete(route('student-documents.destroy', [selectedStudentDocument.student_id, selectedStudentDocument.document_type]), {
             onSuccess: () => {
                 setIsDeleteOpen(false);
                 setselectedStudentDocument(null);
-                toast.success('StudentDocument deleted successfully');
+                toast.success('Student Document deleted successfully');
             },
             onError: (err: Object) => {
                 Object.values(err).forEach((val) => {
@@ -191,7 +218,7 @@ export default function StudentDocumentPage({ student_documents, minimal_student
 
                             <form className="space-y-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="installment_no">Document Type</Label>
+                                    <Label htmlFor="document_type">Document Type</Label>
                                     <Input
                                         id="document_type"
                                         placeholder="Enter document type"
@@ -368,104 +395,56 @@ export default function StudentDocumentPage({ student_documents, minimal_student
             <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Edit fee installment</DialogTitle>
+                        <DialogTitle>Edit student document</DialogTitle>
                         <DialogDescription>
-                            Update the fee installment information.
+                            Update the student document information.
                         </DialogDescription>
                     </DialogHeader>
                     <form onSubmit={handleUpdateSubmit} className="space-y-4">
                         <div className="space-y-2">
-                            {/* <div className="space-y-2">
-                                <Label htmlFor="student_id">Student ID</Label>
-                                <Select onValueChange={(val) => {
-                                    form.setData('student_id', parseInt(val));
-                                }}>
-                                    <SelectTrigger id="student_id">
-                                        <SelectValue placeholder="Select a student" />
-                                    </SelectTrigger>
-                                    <SelectContent >
-                                        {
-                                            minimal_students.map(x =>
-                                                <SelectItem key={x.student_id} value={x.student_id.toString()}>
-                                                    {x.student_id}
-                                                </SelectItem>
-                                            )
-                                        }
-                                    </SelectContent>
-                                </Select>
 
-                            </div> */}
                             <div className="space-y-2">
-                                {/* <Label htmlFor="installment_no">Installment No</Label>
-                                    <Input
-                                        id="installment_no"
-                                        type="number"
-                                        placeholder="Enter installment number"
-                                        value={form.data.installment_no}
-                                        onChange={e => form.setData('installment_no', parseInt(e.target.value))}
-                                        required
-                                    />
-                                    {form.errors.installment_no && (
-                                        <p className="text-sm text-destructive">{form.errors.installment_no}</p>
-                                    )} */}
-                                <Label htmlFor="amount">Amount</Label>
+                                <Label htmlFor="file">File</Label>
                                 <Input
-                                    id="amount"
-                                    type="number"
-                                    placeholder="Enter amount"
-                                    value={form.data.amount}
-                                    onChange={e => form.setData('amount', parseFloat(e.target.value))}
+                                    id="file"
+                                    type="file"
+                                    placeholder="Enter file"
+                                    // value={form.data.file}
+                                    onChange={e => form.setData('file', e.target.files?.[0])}
                                     required
                                 />
-                                {form.errors.amount && (
-                                    <p className="text-sm text-destructive">{form.errors.amount}</p>
+                                {form.errors.file && (
+                                    <p className="text-sm text-destructive">{form.errors.file}</p>
                                 )}
-                                <Label htmlFor="due_date">Due Date</Label>
+                                <Label htmlFor="issue_date">Issue Date</Label>
                                 <Input
-                                    id="due_date"
+                                    id="issue_date"
                                     type="date"
                                     placeholder="YYYY-MM-DD"
-                                    value={form.data.due_date}
-                                    onChange={e => form.setData('due_date', e.target.value)}
+                                    value={form.data.issue_date!}
+                                    onChange={e => form.setData('issue_date', e.target.value)}
                                     required
                                 />
-                                {form.errors.due_date && (
-                                    <p className="text-sm text-destructive">{form.errors.due_date}</p>
+                                {form.errors.issue_date && (
+                                    <p className="text-sm text-destructive">{form.errors.issue_date}</p>
                                 )}
-                                <Label htmlFor="payment_date">Payment Date</Label>
+                                <Label htmlFor="submitted_date">Submitted Date</Label>
                                 <Input
-                                    id="payment_date"
+                                    id="submitted_date"
                                     type="date"
                                     placeholder="YYYY-MM-DD"
-                                    value={form.data.payment_date || ''}
-                                    onChange={e => form.setData('payment_date', e.target.value)}
+                                    value={form.data.submitted_date || ''}
+                                    onChange={e => form.setData('submitted_date', e.target.value)}
                                 />
-                                {form.errors.payment_date && (
-                                    <p className="text-sm text-destructive">{form.errors.payment_date}</p>
-                                )}
-                                <Label htmlFor='status'>Status</Label>
-                                <Select onValueChange={(val) => {
-                                    form.setData('status', val);
-                                }}>
-                                    <SelectTrigger id='status'>
-                                        <SelectValue placeholder='Select status' />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value='Pending'>Pending</SelectItem>
-                                        <SelectItem value='Paid'>Paid</SelectItem>
-                                        <SelectItem value='Overdue'>Overdue</SelectItem>
-                                        <SelectItem value='Cancelled'>Cancelled</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                {form.errors.status && (
-                                    <p className="text-sm text-destructive">{form.errors.status}</p>
+                                {form.errors.submitted_date && (
+                                    <p className="text-sm text-destructive">{form.errors.submitted_date}</p>
                                 )}
 
                             </div>
                         </div>
                         <DialogFooter>
                             <Button type="submit" disabled={form.processing}>
-                                Update StudentDocument
+                                Update Student Document
                             </Button>
                         </DialogFooter>
                     </form>
