@@ -88,6 +88,13 @@ Route::post('/fee-installments', [App\Http\Controllers\FeeInstallmentController:
 Route::put('/fee-installments/{student_id}/{installment_no}', [App\Http\Controllers\FeeInstallmentController::class, 'update'])->name('fee-installments.update');
 Route::delete('/fee-installments/{student_id}/{installment_no}', [App\Http\Controllers\FeeInstallmentController::class, 'destroy'])->name('fee-installments.destroy');
 
+// Student Document route
+Route::get('/student-documents', [App\Http\Controllers\StudentDocumentController::class, 'index'])->name('student-documents.index');
+Route::post('/student-documents', [App\Http\Controllers\StudentDocumentController::class, 'store'])->name('student-documents.store');
+Route::put('/student-documents/{student_id}/{document_type}', [App\Http\Controllers\StudentDocumentController::class, 'update'])->name('student-documents.update');
+Route::delete('/student-documents/{student_id}/{document_type}', [App\Http\Controllers\StudentDocumentController::class, 'destroy'])->name('student-documents.destroy');
+
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');

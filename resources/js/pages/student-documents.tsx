@@ -1,11 +1,11 @@
 import AppLayout from '@/layouts/app';
-import type { FeeInstallment, Student } from '../types';
+import type { StudentDocument, Student } from '../types';
 import { useState } from 'react';
 import { Head, useForm, router, InertiaFormProps } from '@inertiajs/react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Pencil, PlusCircle, Trash2, Eye } from 'lucide-react';
+import { Pencil, PlusCircle, Trash2, Eye, Download } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger, DialogHeader, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -31,29 +31,30 @@ import {
 type Minimal_Student = Pick<Student, 'student_id' | 'first_name' | 'last_name'>;
 
 
-interface FeeInstallmentPageProps {
-    fee_installments: FeeInstallment[];
+interface StudentDocumentPageProps {
+    student_documents: StudentDocument[];
     minimal_students: Minimal_Student[];
 
 }
 
-type FeeInstallmentFormData = Omit<FeeInstallment, 'created_at' | 'updated_at'>;
-export default function FeeInstallmentPage({ fee_installments, minimal_students }: FeeInstallmentPageProps) {
+type StudentDocumentFormData = Omit<StudentDocument, 'file_path' | 'created_at' | 'updated_at'> & {
+    file?: File | null;
+}
+export default function StudentDocumentPage({ student_documents, minimal_students }: StudentDocumentPageProps) {
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [isSelectStudentOpen, setIsSelectStudentOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-    const [selectedFeeInstallment, setselectedFeeInstallment] = useState<FeeInstallment | null>(null);
+    const [selectedStudentDocument, setselectedStudentDocument] = useState<StudentDocument | null>(null);
 
     console.log(minimal_students)
     // 
-    const form: InertiaFormProps<FeeInstallmentFormData> = useForm<FeeInstallmentFormData>({
+    const form: InertiaFormProps<StudentDocumentFormData> = useForm<StudentDocumentFormData>({
         student_id: 0,
-        installment_no: 0,
-        amount: 0,
-        due_date: '',
-        payment_date: null,
-        status: null
+        document_type: '',
+        file: null,
+        issue_date: '',
+        submitted_date: null,
     });
 
     const handleCreateOpenChange = (open: boolean) => {
@@ -68,22 +69,22 @@ export default function FeeInstallmentPage({ fee_installments, minimal_students 
         e.preventDefault();
 
         console.log('form', form.data);
-        form.post(route("fee-installments.store"), {
+        form.post(route("student-documents.store"), {
             preserveScroll: true,
             fresh: true,
+            forceFormData: true, // Needed for file uploads with Inertia
             onSuccess: () => {
                 // must set the default to prevent reset to previous submit
                 form.setDefaults({
                     student_id: 0,
-                    installment_no: 0,
-                    amount: 0,
-                    due_date: '',
-                    payment_date: null,
-                    status: null
+                    document_type: '',
+                    file: null,
+                    issue_date: '',
+                    submitted_date: null,
                 });
                 form.reset();
                 setIsSelectStudentOpen(false);
-                toast.success('FeeInstallment created successfully')
+                toast.success('Student Document created successfully')
             },
             onError: (err: Object) => {
 
@@ -99,40 +100,38 @@ export default function FeeInstallmentPage({ fee_installments, minimal_students 
     }
 
 
-    const handleEditClick = (fee_installment: FeeInstallment) => {
-        setselectedFeeInstallment(fee_installment);
+    const handleEditClick = (student_document: StudentDocument) => {
+        setselectedStudentDocument(student_document);
 
         form.setData({
-            student_id: fee_installment.student_id,
-            installment_no: fee_installment.installment_no,
-            amount: fee_installment.amount,
-            due_date: fee_installment.due_date,
-            payment_date: fee_installment.payment_date || null,
-            status: fee_installment.status || null
+            student_id: student_document.student_id,
+            document_type: student_document.document_type,
+            file: null,
+            issue_date: student_document.issue_date,
+            submitted_date: student_document.submitted_date,
         });
         setIsEditOpen(true);
     }
     const handleUpdateSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!selectedFeeInstallment) return;
+        if (!selectedStudentDocument) return;
         console.log(form.data)
-        console.log(route('fee-installments.update', [selectedFeeInstallment.student_id, selectedFeeInstallment.installment_no]))
-        form.put(route('fee-installments.update', [selectedFeeInstallment.student_id, selectedFeeInstallment.installment_no]),
+        console.log(route('student_documents.update', [selectedStudentDocument.student_id, selectedStudentDocument.document_type]))
+        form.put(route('student_documents.update', [selectedStudentDocument.student_id, selectedStudentDocument.document_type]),
 
             {
                 onSuccess: () => {
                     form.setDefaults({
                         student_id: 0,
-                        installment_no: 0,
-                        amount: 0,
-                        due_date: '',
-                        payment_date: null,
-                        status: null
+                        document_type: '',
+                        file: null,
+                        issue_date: '',
+                        submitted_date: null,
                     });
                     setIsEditOpen(false);
-                    setselectedFeeInstallment(null);
+                    setselectedStudentDocument(null);
                     form.reset();
-                    toast.success('FeeInstallment updated successfully');
+                    toast.success('StudentDocument updated successfully');
                 },
                 onError: (err: Object) => {
                     Object.values(err).forEach((val) => {
@@ -144,17 +143,17 @@ export default function FeeInstallmentPage({ fee_installments, minimal_students 
                 }
             });
     };
-    const handleDeleteClick = (subject: FeeInstallment) => {
-        setselectedFeeInstallment(subject);
+    const handleDeleteClick = (subject: StudentDocument) => {
+        setselectedStudentDocument(subject);
         setIsDeleteOpen(true);
     }
     const handleOKDeleteClick = () => {
-        if (!selectedFeeInstallment) return;
-        router.delete(route('fee-installments.destroy', [selectedFeeInstallment.student_id, selectedFeeInstallment.installment_no]), {
+        if (!selectedStudentDocument) return;
+        router.delete(route('student_documents.destroy', [selectedStudentDocument.student_id, selectedStudentDocument.installment_no]), {
             onSuccess: () => {
                 setIsDeleteOpen(false);
-                setselectedFeeInstallment(null);
-                toast.success('FeeInstallment deleted successfully');
+                setselectedStudentDocument(null);
+                toast.success('StudentDocument deleted successfully');
             },
             onError: (err: Object) => {
                 Object.values(err).forEach((val) => {
@@ -168,92 +167,77 @@ export default function FeeInstallmentPage({ fee_installments, minimal_students 
 
     return (
         <AppLayout>
-            <Head title="FeeInstallments" />
+            <Head title="StudentDocuments" />
             <ToastContainer />
             <div className="container mx-auto py-6 space-y-6">
                 <div className="flex justify-between items-center">
-                    <h1 className="text-3xl font-bold tracking-tight">FeeInstallment</h1>
+                    <h1 className="text-3xl font-bold tracking-tight">Student Document</h1>
                     <Dialog open={isCreateOpen} onOpenChange={handleCreateOpenChange}>
                         <DialogTrigger asChild>
                             <Button>
                                 <PlusCircle className="mr-2 h-4 w-4" />
-                                Add fee installment
+                                Add student document
                             </Button>
                         </DialogTrigger>
                         <DialogContent>
                             <DialogHeader>
-                                <DialogTitle>Add new fee installment</DialogTitle>
+                                <DialogTitle>Add new student document</DialogTitle>
                                 <DialogDescription>
-                                    create a fee installment for a student in your institution.
+                                    create a student document in your institution.
 
                                 </DialogDescription>
                             </DialogHeader>
+
+
                             <form className="space-y-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="installment_no">Installment No</Label>
+                                    <Label htmlFor="installment_no">Document Type</Label>
                                     <Input
-                                        id="installment_no"
-                                        type="number"
-                                        placeholder="Enter installment number"
-                                        value={form.data.installment_no}
-                                        onChange={e => form.setData('installment_no', parseInt(e.target.value))}
+                                        id="document_type"
+                                        placeholder="Enter document type"
+                                        value={form.data.document_type}
+                                        onChange={e => form.setData('document_type', (e.target.value))}
                                         required
                                     />
-                                    {form.errors.installment_no && (
-                                        <p className="text-sm text-destructive">{form.errors.installment_no}</p>
+                                    {form.errors.document_type && (
+                                        <p className="text-sm text-destructive">{form.errors.document_type}</p>
                                     )}
-                                    <Label htmlFor="amount">Amount</Label>
+                                    <Label htmlFor="file">File</Label>
                                     <Input
-                                        id="amount"
-                                        type="number"
-                                        placeholder="Enter amount"
-                                        value={form.data.amount}
-                                        onChange={e => form.setData('amount', parseFloat(e.target.value))}
+                                        id="file"
+                                        type="file"
+                                        placeholder="Enter file"
+                                        // value={form.data.file}
+                                        onChange={e => form.setData('file', e.target.files?.[0])}
                                         required
                                     />
-                                    {form.errors.amount && (
-                                        <p className="text-sm text-destructive">{form.errors.amount}</p>
+                                    {form.errors.file && (
+                                        <p className="text-sm text-destructive">{form.errors.file}</p>
                                     )}
-                                    <Label htmlFor="due_date">Due Date</Label>
+                                    <Label htmlFor="issue_date">Issue Date</Label>
                                     <Input
-                                        id="due_date"
+                                        id="issue_date"
                                         type="date"
                                         placeholder="YYYY-MM-DD"
-                                        value={form.data.due_date}
-                                        onChange={e => form.setData('due_date', e.target.value)}
+                                        value={form.data.issue_date!}
+                                        onChange={e => form.setData('issue_date', e.target.value)}
                                         required
                                     />
-                                    {form.errors.due_date && (
-                                        <p className="text-sm text-destructive">{form.errors.due_date}</p>
+                                    {form.errors.issue_date && (
+                                        <p className="text-sm text-destructive">{form.errors.issue_date}</p>
                                     )}
-                                    <Label htmlFor="payment_date">Payment Date</Label>
+                                    <Label htmlFor="submitted_date">Submitted Date</Label>
                                     <Input
-                                        id="payment_date"
+                                        id="submitted_date"
                                         type="date"
                                         placeholder="YYYY-MM-DD"
-                                        value={form.data.payment_date || ''}
-                                        onChange={e => form.setData('payment_date', e.target.value)}
+                                        value={form.data.submitted_date || ''}
+                                        onChange={e => form.setData('submitted_date', e.target.value)}
                                     />
-                                    {form.errors.payment_date && (
-                                        <p className="text-sm text-destructive">{form.errors.payment_date}</p>
+                                    {form.errors.submitted_date && (
+                                        <p className="text-sm text-destructive">{form.errors.submitted_date}</p>
                                     )}
-                                    <Label htmlFor='status'>Status</Label>
-                                    <Select onValueChange={(val) => {
-                                        form.setData('status', val);
-                                    }}>
-                                        <SelectTrigger id='status'>
-                                            <SelectValue placeholder='Select status' />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value='Pending'>Pending</SelectItem>
-                                            <SelectItem value='Paid'>Paid</SelectItem>
-                                            <SelectItem value='Overdue'>Overdue</SelectItem>
-                                            <SelectItem value='Cancelled'>Cancelled</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    {form.errors.status && (
-                                        <p className="text-sm text-destructive">{form.errors.status}</p>
-                                    )}
+
 
                                 </div>
 
@@ -268,39 +252,62 @@ export default function FeeInstallmentPage({ fee_installments, minimal_students 
                 </div>
                 <Card>
                     <CardHeader>
-                        <CardTitle>FeeInstallment List</CardTitle>
+                        <CardTitle>StudentDocument List</CardTitle>
                         <CardDescription>
-                            Manage and organize fee installments in your institution.
+                            Manage and organize student document in your institution.
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
                         <Table>
                             <TableHeader>
                                 <TableRow>
+
                                     <TableHead>Student ID</TableHead>
-                                    <TableHead>Installment No</TableHead>
-                                    <TableHead>Amount</TableHead>
-                                    <TableHead>Due Date</TableHead>
-                                    <TableHead>Payment Date</TableHead>
-                                    <TableHead>Status</TableHead>
+                                    <TableHead>Document Type</TableHead>
+                                    <TableHead>File</TableHead>
+                                    <TableHead>Issue Date</TableHead>
+                                    <TableHead>Submitted Date</TableHead>
                                     <TableHead className="text-right">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
 
-                                {fee_installments.map((fee_installment, index) => (
+                                {student_documents.map((student_document, index) => (
                                     <TableRow key={index}>
-                                        <TableCell>{fee_installment.student_id}</TableCell>
-                                        <TableCell>{fee_installment.installment_no}</TableCell>
-                                        <TableCell>{'$' + fee_installment.amount}</TableCell>
-                                        <TableCell>{fee_installment.due_date}</TableCell>
-                                        <TableCell>{fee_installment.payment_date || 'Not Paid'}</TableCell>
-                                        <TableCell>{fee_installment.status || 'Pending'}</TableCell>
+
+                                        <TableCell>{student_document.student_id}</TableCell>
+                                        <TableCell>{student_document.document_type}</TableCell>
+                                        <TableCell>
+                                            {/* {"View"} */}
+                                            <div className="flex items-center gap-4">
+                                                <a
+                                                    href={`/storage/${student_document.file_path}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="flex items-center gap-1 text-blue-600 hover:text-blue-800 transition-colors"
+                                                >
+                                                    <Eye className="w-4 h-4" />
+                                                    <span>View</span>
+                                                </a>
+
+                                                <a
+                                                    href={`/storage/${student_document.file_path}`}
+                                                    download
+                                                    className="flex items-center gap-1 text-green-600 hover:text-green-800 transition-colors"
+                                                >
+                                                    <Download className="w-4 h-4" />
+                                                    <span>Download</span>
+                                                </a>
+                                            </div>
+
+                                        </TableCell>
+                                        <TableCell>{student_document.issue_date}</TableCell>
+                                        <TableCell>{student_document.submitted_date}</TableCell>
                                         <TableCell className="text-right space-x-2">
-                                            <Button variant="outline" size="icon" onClick={() => handleEditClick(fee_installment)}>
+                                            <Button variant="outline" size="icon" onClick={() => handleEditClick(student_document)}>
                                                 <Pencil className="h-4 w-4" />
                                             </Button>
-                                            <Button variant="destructive" size="icon" onClick={() => handleDeleteClick(fee_installment)}>
+                                            <Button variant="destructive" size="icon" onClick={() => handleDeleteClick(student_document)}>
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>
 
@@ -319,7 +326,7 @@ export default function FeeInstallmentPage({ fee_installments, minimal_students 
                     <DialogHeader>
                         <DialogTitle>Select student</DialogTitle>
                         <DialogDescription>
-                            Choose a student to associate with the fee installment.
+                            Choose a student for the document.
                         </DialogDescription>
                     </DialogHeader>
                     <form onSubmit={handleCreateSubmit} className="space-y-4">
@@ -458,7 +465,7 @@ export default function FeeInstallmentPage({ fee_installments, minimal_students 
                         </div>
                         <DialogFooter>
                             <Button type="submit" disabled={form.processing}>
-                                Update FeeInstallment
+                                Update StudentDocument
                             </Button>
                         </DialogFooter>
                     </form>

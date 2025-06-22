@@ -11,6 +11,7 @@ export default function Start() {
         { href: "/students", label: "Student" },
         { href: "/class-sessions", label: "ClassSession" },
         { href: "/fee-installments", label: "FeeInstallment" },
+        { href: "/student-documents", label: "StudentDocument" },
         
                     
     ];
