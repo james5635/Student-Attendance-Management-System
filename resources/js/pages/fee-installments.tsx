@@ -37,7 +37,7 @@ interface FeeInstallmentPageProps {
 
 }
 
-type FeeInstallmentFormData = Omit<FeeInstallment,  'created_at' | 'updated_at'>;
+type FeeInstallmentFormData = Omit<FeeInstallment, 'created_at' | 'updated_at'>;
 export default function FeeInstallmentPage({ fee_installments, minimal_students }: FeeInstallmentPageProps) {
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [isSelectStudentOpen, setIsSelectStudentOpen] = useState(false);
@@ -117,32 +117,32 @@ export default function FeeInstallmentPage({ fee_installments, minimal_students 
         if (!selectedFeeInstallment) return;
         console.log(form.data)
         console.log(route('fee-installments.update', [selectedFeeInstallment.student_id, selectedFeeInstallment.installment_no]))
-        form.put(route('fee-installments.update', [selectedFeeInstallment.student_id, selectedFeeInstallment.installment_no]), 
-       
-        {
-            onSuccess: () => {
-                form.setDefaults({
-                    student_id: 0,
-                    installment_no: 0,
-                    amount: 0,
-                    due_date: '',
-                    payment_date: null,
-                    status: null
-                });
-                setIsEditOpen(false);
-                setselectedFeeInstallment(null);
-                form.reset();
-                toast.success('FeeInstallment updated successfully');
-            },
-            onError: (err: Object) => {
-                Object.values(err).forEach((val) => {
-                    toast.error(val);
-                })
-                // toast.error('Failed to update subject');
-                form.clearErrors();
+        form.put(route('fee-installments.update', [selectedFeeInstallment.student_id, selectedFeeInstallment.installment_no]),
 
-            }
-        });
+            {
+                onSuccess: () => {
+                    form.setDefaults({
+                        student_id: 0,
+                        installment_no: 0,
+                        amount: 0,
+                        due_date: '',
+                        payment_date: null,
+                        status: null
+                    });
+                    setIsEditOpen(false);
+                    setselectedFeeInstallment(null);
+                    form.reset();
+                    toast.success('FeeInstallment updated successfully');
+                },
+                onError: (err: Object) => {
+                    Object.values(err).forEach((val) => {
+                        toast.error(val);
+                    })
+                    // toast.error('Failed to update subject');
+                    form.clearErrors();
+
+                }
+            });
     };
     const handleDeleteClick = (subject: FeeInstallment) => {
         setselectedFeeInstallment(subject);
@@ -150,7 +150,7 @@ export default function FeeInstallmentPage({ fee_installments, minimal_students 
     }
     const handleOKDeleteClick = () => {
         if (!selectedFeeInstallment) return;
-        router.delete(route('fee_installments.destroy', selectedFeeInstallment.fee_installment_id), {
+        router.delete(route('fee-installments.destroy', [selectedFeeInstallment.student_id, selectedFeeInstallment.installment_no]), {
             onSuccess: () => {
                 setIsDeleteOpen(false);
                 setselectedFeeInstallment(null);

@@ -47,4 +47,11 @@ class FeeInstallmentController extends Controller
         $fee_installment->update($validated_data);
         return redirect()->back()->with('success', 'Fee installment updated successfully.');
     }
+  public function destroy($student_id, $installment_no)
+    {
+        $fee_installment = FeeInstallment::find([$student_id, $installment_no]);
+        $fee_installment->delete();
+
+        return redirect()->back()->with('success', 'Fee installment deleted successfully.');
+    }
 }
