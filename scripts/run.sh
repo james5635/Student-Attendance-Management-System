@@ -1,6 +1,7 @@
 #!/usr/bin/env sh
 echo "Running composer"
-composer install --no-dev
+# composer install --no-dev
+composer install 
 
 echo "Caching config..."
 php artisan config:cache
@@ -16,5 +17,7 @@ php artisan migrate:fresh  --seed --force
 # php artisan vendor:publish --provider="CloudinaryLabs\CloudinaryLaravel\CloudinaryServiceProvider" --tag="cloudinary-laravel-config"
 
 npm install && npm run build
+
+npm run dev &
 
 php artisan serve --host=0.0.0.0
