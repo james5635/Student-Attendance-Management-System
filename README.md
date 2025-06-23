@@ -11,6 +11,6 @@ There are 9 forms in this application.
 - [x] Student Document (លឹម វិវឌ្ឈន៍)
 # Start the application
 ```sh
-# Make sure the database is confiugre correctly
+# Make sure the database is configure correctly
 composer run dev
 ```
