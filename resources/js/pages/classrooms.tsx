@@ -59,6 +59,7 @@ export default function Classroom({ classrooms }: ClassroomProps) {
                 Object.values(err).forEach((val) => {
                     toast.error(val);
                 })
+                form.clearErrors()
 
             }
         })
@@ -82,10 +83,12 @@ export default function Classroom({ classrooms }: ClassroomProps) {
                 toast.success('Classroom updated successfully');
             },
             onError: (err: Object) => {
-                // Object.values(err).forEach((val) => {
-                //     toast.error(val);
-                // })
-                toast.error('Failed to update classroom');
+                Object.values(err).forEach((val) => {
+                    toast.error(val);
+                })
+                // toast.error('Failed to update classroom');
+                form.clearErrors()
+
             }
         });
     };
